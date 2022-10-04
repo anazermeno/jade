@@ -1,6 +1,6 @@
 # JADE
 
-### Por: Ana Zermeño y Ana Carolina Alvarez
+### Por: Ana Zermeño y Ana Carolina Arellano
 #### Avance 1
 #### 03/10/2022
 
