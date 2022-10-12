@@ -1,10 +1,25 @@
 # Var Table
-class varTable:
+class VariableTable:
     
     def __init__(self):
         global table
         table = [[]] #empty matrix
+        
+    def idExist(self, id) :
+        if id in table:
+            return True
+        return False
 
-    # add
-    # delete
-    # search
+    def validateType(self, type) :
+        if type != 'object'  and type != 'int'  and type != 'float' and type != 'bool':
+            return False
+        return True   
+
+    def addVar(self, id, type, size, dir) :
+        if(self.validateType(type) and not self.idExist(id)):
+            newVar = {'id': id, 'type': type, 'size': size, 'dir': dir}
+            table.append(newVar)
+    
+    # Function to get ID
+
+    # Function to get type

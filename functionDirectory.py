@@ -1,12 +1,14 @@
 # Function Directory
+from varTable import VariableTable
+
 class FunctionDirectory:
     
     def __init__(self):
         global directory
-        directory = {'id': '', 'type': '', 'varsDirectory': {}}
+        directory = {'id': '', 'type': '', 'varsDirectory': VariableTable}
 
     def validateType(self, type) :
-        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float':
+        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool':
             return False
         return True   
 
@@ -20,9 +22,9 @@ class FunctionDirectory:
             directoryTemp = {'id': id, 'type': type, 'varsDirectory': vars}
             directory.update(directoryTemp)
 
-    # delete functionTable
-    # search functionTable
-    
+    def emptyDirectory(self):
+        directory.clear()
+
     def printContent(self):
         print(directory)
 
