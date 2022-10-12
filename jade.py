@@ -12,6 +12,7 @@ import ply.lex as lex
 from ply.yacc import yacc
 from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
+from varTable import VariableTable
 
 # Tokens
 reserved = {
@@ -146,7 +147,7 @@ lexer = lex.lex()
 # Functions for each grammar rule
 def p_program( p ):
     '''
-    program : PROGRAM ID block
+    program : PROGRAM ID createDir block
     '''
 
 def p_block( p ):
@@ -178,6 +179,12 @@ def p_block5( p ):
            | empty
     '''
 
+def p_createDir( p ):
+    '''
+    createDir : empty
+    '''
+    programDirectory = FunctionDirectory()
+
 def p_statement( p ):
     '''
     statement : assign
@@ -199,6 +206,7 @@ def p_var2( p ):
     '''
     var2 : ID var3
     '''
+    programDirectory.addFunction(p[1], 'VAR', VariableTable()) # como ponemos el directorio?
 
 def p_var3( p ):
     '''
@@ -475,34 +483,10 @@ print (num + num1);
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
-    lexer.input(text)
     print("Success")
 else:
     print("Failed")
 
-directoryTest = FunctionDirectory()
-directoryTest.addFunction("varHola", "int", FunctionDirectory())
-directoryTest.printContent()
-"""""""""
-tempQueue = []
-# Tokenize
-while True:
-    tok = lexer.token()
-    print(tok)
-    tempQueue.append(tok)
-    if not tok: 
-         break      # No more input
-
-while tempQueue:
-    tempToken = tempQueue[0]
-    print(tempToken[0])
-    if(tempToken[0] == 'VAR'): # ??? 
-        tempQueue.pop(0)
-        curr = tempQueue[0]
-        print(curr)
-        directoryTest.addFunction(curr[1], 'VAR', FunctionDirectory())   
-    tempQueue.pop(0)     
-"""
 dError = True
 
 print("*Test case 2 - failed")

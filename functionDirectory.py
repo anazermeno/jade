@@ -6,7 +6,7 @@ class FunctionDirectory:
         directory = {'id': '', 'type': '', 'varsDirectory': {}}
 
     def validateType(self, type) :
-        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float':
+        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool':
             return False
         return True   
 
@@ -19,6 +19,9 @@ class FunctionDirectory:
         if(self.validateType(type) and not self.idExist(id)):
             directoryTemp = {'id': id, 'type': type, 'varsDirectory': vars}
             directory.update(directoryTemp)
+
+    def emptyDirectory(self):
+        directory.clear()
 
     def printContent(self):
         print(directory)
