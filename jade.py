@@ -148,6 +148,7 @@ def p_program( p ):
     '''
     program : PROGRAM ID block
     '''
+    # aqui va el remove del dirFun
 
 def p_block( p ):
     '''
@@ -274,8 +275,14 @@ def p_read( p ):
 
 def p_fun( p ):
     ''' 
-    fun : FUN fun2 ID OPARENTHESIS params CPARENTHESIS block
+    fun : FUN fun2 fun_addFun OPARENTHESIS params CPARENTHESIS block
     '''
+
+def p_fun_addFun(p):
+    '''
+    fun_addFun : ID
+    '''
+    # aqui va la funcion
 
 def p_fun2( p ):
     '''

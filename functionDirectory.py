@@ -20,6 +20,9 @@ class FunctionDirectory:
             directoryTemp = {'id': id, 'type': type, 'varsDirectory': vars}
             directory.update(directoryTemp)
 
+    # delete functionTable
+    # search functionTable
+    
     def printContent(self):
         print(directory)
 
