@@ -2,13 +2,16 @@
 # JADE
 # Ana Lizbeth Zermeño Torres     A00824913
 # Ana Carolina Arellano Alvarez  A01650945
-# September 2022
+# October 2022
 # ------------------------------------------
 
 # Import Lex and Yacc
+from asyncio import create_subprocess_exec
 from tkinter.tix import TCL_DONT_WAIT
-from ply.lex import lex
+import ply.lex as lex
 from ply.yacc import yacc
+from functionDirectory import FunctionDirectory
+from semanticCube import CUBE
 
 # Tokens
 reserved = {
@@ -137,31 +140,7 @@ def t_error(t):
     dError = False
 
 # Build the lexer object
-lexer = lex()
-    
-#lexer test
-data = '''
-3 + 4 * 10
-+ -20 *2
-// comentario
-var
-3.5 != 5.1
-6.2 == 6.2
-4/4
-4 / 4
-id1 = 12
-var id2 = 1.3
-'''
- 
-# Give the lexer some input
-lexer.input(data)
- 
-# Tokenize
-while True:
-    tok = lexer.token()
-    if not tok: 
-        break      # No more input
-    print(tok)
+lexer = lex.lex()
  
 # Parser
 # Functions for each grammar rule
@@ -475,8 +454,6 @@ def p_empty( p ):
      '''
      pass
 
-
-
 # Error handler for illegal syntaxis
 def p_error( p ):
     print("Syntax error at " + str(p.value))
@@ -488,20 +465,44 @@ parser = yacc()
 dError = True
 
 print("*Test case - correct")
-case_TestCorrect = parser.parse('''
+text = '''
 program test1 {
 var int num, num1;
 assign num = 2, num1 = 3;
 
 print (num + num1);
-}''')
+}'''
+case_TestCorrect = parser.parse(text)
 
 if(dError == True):
+    lexer.input(text)
     print("Success")
 else:
     print("Failed")
 
+directoryTest = FunctionDirectory()
+directoryTest.addFunction("varHola", "int", FunctionDirectory())
+directoryTest.printContent()
+"""""""""
+tempQueue = []
+# Tokenize
+while True:
+    tok = lexer.token()
+    print(tok)
+    tempQueue.append(tok)
+    if not tok: 
+         break      # No more input
 
+while tempQueue:
+    tempToken = tempQueue[0]
+    print(tempToken[0])
+    if(tempToken[0] == 'VAR'): # ??? 
+        tempQueue.pop(0)
+        curr = tempQueue[0]
+        print(curr)
+        directoryTest.addFunction(curr[1], 'VAR', FunctionDirectory())   
+    tempQueue.pop(0)     
+"""
 dError = True
 
 print("*Test case 2 - failed")
@@ -522,3 +523,9 @@ if(dError == True):
     print("Success")
 else:
     print("Failed")
+
+# Test for semantic cube
+if CUBE[int][float][">"] != -1:
+    print("valid")
+else:
+    print("invalid")
