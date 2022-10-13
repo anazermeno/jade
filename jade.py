@@ -147,9 +147,17 @@ lexer = lex.lex()
 # Functions for each grammar rule
 def p_program( p ):
     '''
-    program : PROGRAM ID createDir block
+    program : PROGRAM createDir block
+    '''    
+
+def p_createDir( p ):
     '''
-    # aqui va el remove del dirFun
+    createDir : ID
+    '''
+    global programDirectory 
+    programDirectory = FunctionDirectory()
+    programDirectory.setId(p[1])
+    programDirectory.addFunction(programDirectory.returnId(), "program", 0) 
 
 def p_block( p ):
     '''
@@ -180,12 +188,6 @@ def p_block5( p ):
            | empty
     '''
 
-def p_createDir( p ):
-    '''
-    createDir : empty
-    '''
-    programDirectory = FunctionDirectory()
-
 def p_statement( p ):
     '''
     statement : assign
@@ -200,29 +202,58 @@ def p_statement( p ):
 
 def p_var( p ):
     '''
-    var : VAR type var2 SEMICOLON
+    var : VAR varType var2 SEMICOLON
     '''
 
+def p_varType( p ):
+    '''
+    varType : type
+    '''
+ 
 def p_var2( p ):
     '''
-    var2 : ID var3
-    '''
+    var2 : varID var3
+    ''' 
     
-    #programDirectory.addFunction(p[1], 'VAR', VariableTable()) # como ponemos el directorio?
+def p_varID( p ):
+    '''
+    varID : ID
+    '''
+    programDirectory.setId(p[1])
 
 def p_var3( p ):
     '''
-    var3 : COMMA var2
-         | OBRACKET CTEINT CBRACKET COMMA var2
-         | empty
-    '''
+    var3 : setVar var2
+         | OBRACKET varArray CBRACKET COMMA var2
+         | setVar2
+    '''     
 
+def p_setVar2( p ):
+    '''
+    setVar2 : empty
+    '''
+    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+
+def p_setVar( p ):
+    '''
+    setVar : COMMA
+    '''
+    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+
+def p_varArray( p ):
+    '''
+    varArray : CTEINT
+    '''
+    size = p[1]
+    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
+    
 def p_type( p ):
     '''
     type : INT
          | FLOAT
          | BOOL
     '''
+    programDirectory.setType(p[1])
 
 def p_assign( p ):
     '''
@@ -483,7 +514,7 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-var int num, num1;
+var int num[4], num1;
 assign num = 2, num1 = 3;
 
 print (num + num1);
@@ -496,9 +527,9 @@ else:
     print("Failed")
 
 dError = True
-
+'''
 print("*Test case 2 - failed")
-case_TestCorrect = parser.parse('''
+case_TestCorrect = parser.parse(
 program test2 {
 fun int multi(int num1){
     var int a;
@@ -509,8 +540,9 @@ fun int multi(int num1){
     num1 * num1; 
 }
 }
-''')
+)'''
 
+"""""
 if(dError == True):
     print("Success")
 else:
@@ -521,3 +553,4 @@ if CUBE[int][float][">"] != -1:
     print("valid")
 else:
     print("invalid")
+"""""
