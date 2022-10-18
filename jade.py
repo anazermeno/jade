@@ -7,12 +7,17 @@
 
 # Import Lex and Yacc
 from asyncio import create_subprocess_exec
+from stack import Stack
 from tkinter.tix import TCL_DONT_WAIT
 import ply.lex as lex
 from ply.yacc import yacc
 from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
-from varTable import VariableTable
+from stack import Stack
+
+operatorPop : Stack
+operandPop : Stack
+jumpsPop : Stack
 
 # Tokens
 reserved = {
@@ -154,10 +159,15 @@ def p_createDir( p ):
     '''
     createDir : ID
     '''
+    # Create global directory
     global programDirectory 
     programDirectory = FunctionDirectory()
     programDirectory.setId(p[1])
-    programDirectory.addFunction(programDirectory.returnId(), "program", 0) 
+    programDirectory.addFunction(programDirectory.returnId(), "program", 0)
+    # Create scope stack
+    global scopeStack
+    scopeStack = Stack()
+    scopeStack.add(programDirectory.returnId())
 
 def p_block( p ):
     '''
@@ -232,20 +242,20 @@ def p_setVar2( p ):
     '''
     setVar2 : empty
     '''
-    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
 
 def p_setVar( p ):
     '''
     setVar : COMMA
     '''
-    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
 
 def p_varArray( p ):
     '''
     varArray : CTEINT
     '''
     size = p[1]
-    programDirectory.getVarTable("test1").addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
+    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
     
 def p_type( p ):
     '''
@@ -523,6 +533,7 @@ case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     print("Success")
+    programDirectory.printContent()
 else:
     print("Failed")
 

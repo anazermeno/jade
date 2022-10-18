@@ -7,10 +7,10 @@ class FunctionDirectory:
         self.id = ''
         self.type = ''
         global directory
-        directory = {'id' : {'type': '', 'size': 0,'varsDirectory': VariableTable}}
+        directory = {}
 
     def validateType(self, type) :
-        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool':
+        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool' and type !="program":
             return False
         return True   
 
@@ -20,9 +20,9 @@ class FunctionDirectory:
         return False
         
     def addFunction(self, id, type, size) :
-        #if(self.validateType(type) and not self.idExist(id)):
-        directoryTemp = {id : {'type': type, 'size': size, 'varsTable': VariableTable()}} 
-        directory.update(directoryTemp)
+        if(self.validateType(type) and not self.idExist(id)):
+            directoryTemp = {id : {'type': type, 'size': size, 'varsTable': VariableTable()}} 
+            directory.update(directoryTemp)
 
     def getVarTable(self, id):
         return directory.get(id)["varsTable"]
@@ -31,7 +31,18 @@ class FunctionDirectory:
         directory.clear()
 
     def printContent(self):
-        print(directory)
+        for value in directory:
+            print(value)
+            if type(directory[value]) is dict:
+                for item in directory[value]:
+                    if item == "varsTable":
+                        print("VAR TABLE:")
+                        self.TraverseVarTable(value)
+                    else:
+                        print(item, ':', directory[value][item])
+
+    def TraverseVarTable(self, id):
+        directory.get(id)["varsTable"].printContent()
 
     # Function to get ID
     def setId(self, id) :

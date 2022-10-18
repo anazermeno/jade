@@ -3,7 +3,7 @@ class VariableTable:
     
     def __init__(self):
         global table
-        table = [[]] #empty matrix
+        table = [] #empty matrix
         
     def idExist(self, id) :
         if id in table:
@@ -18,11 +18,14 @@ class VariableTable:
     
     # Function to add variable to variable table
     def addVar(self, id, type, size, dir = 0) :
-        #if(self.validateType(type) and not self.idExist(id)):
-        newVar = {'id': id, 'type': type, 'size': size, 'dir': dir}
-        table.append(newVar)
-        print(table)
-    
+        if(self.validateType(type) and not self.idExist(id)):
+            newVar = {'id': id, 'type': type, 'size': size, 'dir': dir}
+            table.append(newVar)
+
+    def printContent(self):
+        for item in table:
+            print(item)
+
     # Function to get ID
     def setId(self, id) :
         self.id = id
