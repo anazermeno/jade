@@ -7,6 +7,8 @@
 -----
 
 Se trabajó en la generación de cuádruplos de estatutos secuenciales. Asimismo, se hicieron mejoras en el directorio de funciones.
+Los métodos del directorio de funciones realizan sus rutinas de forma correcta realizando validaciones que revisan si la funcion ya
+fue declarada y valida si el tipo de retorno existe.
 
 * TODO: Agregar funciones de cuádruplos 
 
