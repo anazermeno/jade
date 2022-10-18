@@ -1,6 +1,18 @@
 # JADE
 
 ### Por: Ana Zermeño y Ana Carolina Arellano
+#### Avance 3
+#### 17/10/2022
+
+-----
+
+Se trabajó en la generación de cuádruplos de estatutos secuenciales. Asimismo, se hicieron mejoras en el directorio de funciones.
+
+* TODO: Agregar funciones de cuádruplos 
+
+------
+
+### Por: Ana Zermeño y Ana Carolina Arellano
 #### Avance 2
 #### 11/10/2022
 
@@ -19,8 +31,6 @@ Para este avance se realizó el cubo seméntico y funcionó como se esperaba en 
 Los tokens y grámatica ya fueron definidos y los diagramas ya están completos.
 Lexer se encuentra completo y funcionando, se incluye código para probarlo.
 
-
-* Actualmente 10 gramáticas presentan recursión infinita, lo cual será resuelto en breve. 
 
 ##### Para correr el programa: 
  - Ir a la terminar en la ubicación del folder JADE
