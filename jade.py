@@ -14,10 +14,14 @@ from ply.yacc import yacc
 from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
 from stack import Stack
+import quadruples
 
-operatorPop : Stack
-operandPop : Stack
-jumpsPop : Stack
+operatorPop = Stack()
+operandPop = Stack()
+jumpsPop = Stack()
+typePop = Stack()
+
+quadrupleList = []
 
 # Tokens
 reserved = {
@@ -405,10 +409,17 @@ def p_m_exp( p ):
 
 def p_m_exp2( p ):
     '''
-    m_exp2 : PLUS m_exp
-           | MINUS m_exp
+    m_exp2 : PLUS opadd m_exp
+           | MINUS opadd m_exp
            | empty
     '''
+
+def p_opadd( p ):
+    '''
+    opadd :
+    '''
+    operatorPop.add(p[-1])
+    print(operatorPop.items)
 
 def p_t( p ):
     '''
@@ -420,15 +431,36 @@ def p_t2( p ):
     t2 : MULT t
        | DIV t
        | empty
-    '''
+    ''' 
 
 def p_f( p ):
     '''
-    f : OPARENTHESIS expression CPARENTHESIS
-      | varvalue
-      | expression
-      | ID
+    f : addFBottom expression popFBottom
+      | addOperand
     '''
+
+def p_addOperand( p ):
+    '''
+    addOperand : varvalue
+               | ID
+    '''
+    operandPop.add(p[1])
+    print(operandPop.items)
+
+
+def p_addFBottom( p ):
+    '''
+    addFBottom : OPARENTHESIS
+    '''
+    operatorPop.addFakeBottom()
+    print(operatorPop.items)
+
+def p_popFBottom( p ):
+    '''
+    popFBottom : CPARENTHESIS
+    '''
+    operatorPop.popFakeBottom()
+    print(operatorPop.items)
 
 def p_params( p ):
     '''
@@ -527,13 +559,15 @@ program test1 {
 var int num[4], num1;
 assign num = 2, num1 = 3;
 
-print (num + num1);
+print ((num + num1));
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     print("Success")
     programDirectory.printContent()
+    quadruples.printQuadrupleList(quadrupleList)
+    
 else:
     print("Failed")
 
@@ -565,3 +599,6 @@ if CUBE[int][float][">"] != -1:
 else:
     print("invalid")
 """""
+
+# Functions
+    

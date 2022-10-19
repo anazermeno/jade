@@ -13,6 +13,11 @@ class Stack:
             raise ValueError("Stack is empty")
 
     def top(self):
-     return self.items[-1]   
-        
+     return self.items[-1]
+
+    def addFakeBottom(self):
+        self.items.append("(")
+    
+    def popFakeBottom(self):
+        self.items.pop()
         

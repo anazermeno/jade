@@ -25,3 +25,7 @@ class Quadruple:
     
     def setOperator(self, operatorPop : Stack):
         self.operator = operatorPop.top()
+    
+def printQuadrupleList(quadrupleList : list):
+    for x in range(len(quadrupleList)):
+        print (quadrupleList[x]),
