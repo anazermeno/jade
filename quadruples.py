@@ -26,6 +26,22 @@ class Quadruple:
     def setOperator(self, operatorPop : Stack):
         self.operator = operatorPop.top()
     
+    def setValues(self, operandPop : Stack, operatorPop : Stack) :
+        self.setOperandRight(operandPop)
+        operandPop.pop()
+        self.setOperandLeft(operandPop)
+        operandPop.pop()
+        self.setOperator(operatorPop) 
+
+    def getOperandLeft(self):
+        return self.operandLeft
+
+    def getOperandRight(self):
+        return self.operandRight
+
+    def getOperator(self):        
+        return self.operator
+
 def printQuadrupleList(quadrupleList : list):
     for x in quadrupleList:
         print (x.id, x.operator, x.operandLeft, x.operandRight, x.result),

@@ -7,6 +7,7 @@
 
 # Import Lex and Yacc
 from asyncio import create_subprocess_exec
+from queue import Empty
 from stack import Stack
 from tkinter.tix import TCL_DONT_WAIT
 import ply.lex as lex
@@ -281,7 +282,7 @@ def p_assign2( p ):
     assign2 : ID OBRACKET CTEINT CBRACKET EQUAL funcall assign3
             | ID OBRACKET CTEINT CBRACKET EQUAL varvalue assign3 
             | ID EQUAL funcall assign3 
-            | ID EQUAL varvalue assign3 
+            | ID EQUAL opadd addOperand assign3 
     '''
 
 def p_assign3( p ):
@@ -445,30 +446,26 @@ def p_addOperand( p ):
     addOperand : varvalue
                | ID
     '''
-    operandPop.add(p[1])
-    global id
-    if not operandPop.size() % 2:
-        tempQuad = quadruples.Quadruple(id,'','','','')
-        tempQuad.setOperandRight(operandPop)
-        operandPop.pop()
-        tempQuad.setOperandLeft(operandPop)
-        tempQuad.setOperator(operatorPop) 
-        quadrupleList.append(tempQuad)
-        id += 1
+    if p[1] != None:
+        operandPop.add(p[1])
+    
+    if  operandPop.size() % 2 == 0 and operandPop.size() > 0:
+        if operatorPop.top() == "=":
+            assignQuadruple()
+        else:
+            plusOrMinusQuadruple()    
 
 def p_addFBottom( p ):
     '''
     addFBottom : OPARENTHESIS
     '''
     operatorPop.addFakeBottom()
-    #print(operatorPop.items)
 
 def p_popFBottom( p ):
     '''
     popFBottom : CPARENTHESIS
     '''
     operatorPop.popFakeBottom()
-    #print(operatorPop.items)
 
 def p_params( p ):
     '''
@@ -492,6 +489,8 @@ def p_varvalue( p ):
              | CTEFLOAT
              | CTESTRING
     '''
+    if operatorPop.top() == "=":
+        operandPop.add(p[1])
 
 def p_class( p ):
     '''
@@ -556,6 +555,27 @@ def p_error( p ):
     print("Syntax error at " + str(p.value))
     global dError
     dError = False
+
+def assignQuadruple():
+    global id
+    tempOp = operandPop.top()
+    operandPop.pop()
+    tempStack = operandPop
+    while type(tempStack.top()) == int and tempStack.size() > 1:
+        tempStack.pop()
+
+    tempStack.add(tempOp)
+    tempQuad = quadruples.Quadruple(id,'','','','')
+    tempQuad.setValues(tempStack, operatorPop)
+    quadrupleList.append(tempQuad)
+    id += 1
+
+def plusOrMinusQuadruple():
+    global id
+    tempQuad = quadruples.Quadruple(id,'','','','')
+    tempQuad.setValues(operandPop, operatorPop)
+    quadrupleList.append(tempQuad)
+    id += 1
 
 # Build the parser
 parser = yacc()
