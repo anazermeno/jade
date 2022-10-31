@@ -31,7 +31,8 @@ class Quadruple:
         operandPop.pop()
         self.setOperandLeft(operandPop)
         operandPop.pop()
-        self.setOperator(operatorPop) 
+        self.setOperator(operatorPop)
+        operatorPop.pop() 
 
     def getOperandLeft(self):
         return self.operandLeft

@@ -8,6 +8,7 @@
 # Import Lex and Yacc
 from asyncio import create_subprocess_exec
 from queue import Empty
+from quadrupleFunctions import validateOperator
 from stack import Stack
 from tkinter.tix import TCL_DONT_WAIT
 import ply.lex as lex
@@ -17,14 +18,15 @@ from semanticCube import CUBE
 from stack import Stack
 import quadruples
 
-operatorPop = Stack()
-operandPop = Stack()
+operatorStack = Stack()
+operandStack = Stack()
 jumpsPop = Stack()
 typePop = Stack()
 
 quadrupleList = []
 
 id = 0
+idTemp = 0
 
 # Tokens
 reserved = {
@@ -398,10 +400,10 @@ def p_g_exp( p ):
 
 def p_g_exp2( p ):
     '''
-    g_exp2 : GREATERTHAN m_exp
-           | LESSTHAN m_exp
-           | ISEQUAL m_exp
-           | NOTEQUAL m_exp
+    g_exp2 : GREATERTHAN opadd m_exp
+           | LESSTHAN opadd m_exp
+           | ISEQUAL opadd m_exp
+           | NOTEQUAL opadd m_exp
            | empty
     '''
 
@@ -421,7 +423,12 @@ def p_opadd( p ):
     '''
     opadd :
     '''
-    operatorPop.add(p[-1])
+    #Checar operador previo
+    if operatorStack.size() > 0 and operatorStack.top() != "(":
+        if validateOperator(p[-1], operatorStack.top()):
+            createQuadruple()
+    operatorStack.add(p[-1])
+    print(operatorStack.items)
 
 def p_t( p ):
     '''
@@ -430,8 +437,8 @@ def p_t( p ):
 
 def p_t2( p ):
     '''
-    t2 : MULT t
-       | DIV t
+    t2 : MULT opadd t
+       | DIV opadd t
        | empty
     ''' 
 
@@ -447,25 +454,20 @@ def p_addOperand( p ):
                | ID
     '''
     if p[1] != None:
-        operandPop.add(p[1])
-    
-    if  operandPop.size() % 2 == 0 and operandPop.size() > 0:
-        if operatorPop.top() == "=":
-            assignQuadruple()
-        else:
-            plusOrMinusQuadruple()    
+        operandStack.add(p[1])
+        print(operandStack.items)
 
 def p_addFBottom( p ):
     '''
     addFBottom : OPARENTHESIS
     '''
-    operatorPop.addFakeBottom()
+    operatorStack.addFakeBottom()
 
 def p_popFBottom( p ):
     '''
     popFBottom : CPARENTHESIS
     '''
-    operatorPop.popFakeBottom()
+    operatorStack.popFakeBottom()
 
 def p_params( p ):
     '''
@@ -489,8 +491,8 @@ def p_varvalue( p ):
              | CTEFLOAT
              | CTESTRING
     '''
-    if operatorPop.top() == "=":
-        operandPop.add(p[1])
+    operandStack.add(p[1])
+    print(operandStack.items)
 
 def p_class( p ):
     '''
@@ -556,24 +558,34 @@ def p_error( p ):
     global dError
     dError = False
 
+def createQuadruple():
+    print("aqui - create")
+    print(operandStack.items)
+    if operandStack.size() > 0 and operandStack.size() % 2 == 0:
+        print("aqui - después if")
+        if operatorStack.top() == "=":
+            assignQuadruple()
+        else:
+            operationQuadruple()
+    print(quadrupleList)
+
+def createTemp():
+    global idTemp
+    idTemp += 1
+    myTemp =  "temp" + str(idTemp)
+    operandStack.add(myTemp)
+
 def assignQuadruple():
     global id
-    tempOp = operandPop.top()
-    operandPop.pop()
-    tempStack = operandPop
-    while type(tempStack.top()) == int and tempStack.size() > 1:
-        tempStack.pop()
-
-    tempStack.add(tempOp)
     tempQuad = quadruples.Quadruple(id,'','','','')
-    tempQuad.setValues(tempStack, operatorPop)
+    tempQuad.setValues(operandStack, operatorStack)
     quadrupleList.append(tempQuad)
     id += 1
 
-def plusOrMinusQuadruple():
+def operationQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'','','','')
-    tempQuad.setValues(operandPop, operatorPop)
+    tempQuad.setValues(operandStack, operatorStack)
     quadrupleList.append(tempQuad)
     id += 1
 
