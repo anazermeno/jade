@@ -15,9 +15,12 @@ class Stack:
     def top(self):
      return self.items[-1]
 
+    def size(self):
+        return len(self.items) 
+
     def addFakeBottom(self):
         self.items.append("(")
     
     def popFakeBottom(self):
-        self.items.pop()
+        self.items.pop()   
         
