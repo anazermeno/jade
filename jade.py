@@ -23,6 +23,8 @@ typePop = Stack()
 
 quadrupleList = []
 
+id = 0
+
 # Tokens
 reserved = {
     'program' : 'PROGRAM',
@@ -419,7 +421,6 @@ def p_opadd( p ):
     opadd :
     '''
     operatorPop.add(p[-1])
-    print(operatorPop.items)
 
 def p_t( p ):
     '''
@@ -445,22 +446,27 @@ def p_addOperand( p ):
                | ID
     '''
     operandPop.add(p[1])
-    print(operandPop.items)
-
+    if not operandPop.size() % 2:
+        tempQuad = quadruples.Quadruple(id,'','','','')
+        tempQuad.setOperandRight(operandPop)
+        operandPop.pop()
+        tempQuad.setOperandLeft(operandPop)
+        tempQuad.setOperator(operatorPop) 
+        quadrupleList.append(tempQuad) 
 
 def p_addFBottom( p ):
     '''
     addFBottom : OPARENTHESIS
     '''
     operatorPop.addFakeBottom()
-    print(operatorPop.items)
+    #print(operatorPop.items)
 
 def p_popFBottom( p ):
     '''
     popFBottom : CPARENTHESIS
     '''
     operatorPop.popFakeBottom()
-    print(operatorPop.items)
+    #print(operatorPop.items)
 
 def p_params( p ):
     '''
@@ -560,45 +566,14 @@ var int num[4], num1;
 assign num = 2, num1 = 3;
 
 print ((num + num1));
+print ((num - num1));
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
-    print("Success")
-    programDirectory.printContent()
     quadruples.printQuadrupleList(quadrupleList)
     
 else:
     print("Failed")
 
 dError = True
-'''
-print("*Test case 2 - failed")
-case_TestCorrect = parser.parse(
-program test2 {
-fun int multi(int num1){
-    var int a;
-    assign a = 0;
-    return a;
-
-    //TODO: Check how to add instructions after return
-    num1 * num1; 
-}
-}
-)'''
-
-"""""
-if(dError == True):
-    print("Success")
-else:
-    print("Failed")
-
-# Test for semantic cube
-if CUBE[int][float][">"] != -1:
-    print("valid")
-else:
-    print("invalid")
-"""""
-
-# Functions
-    

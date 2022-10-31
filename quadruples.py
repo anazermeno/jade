@@ -10,8 +10,8 @@ class Quadruple:
     result : str
     tempCounter : int
 
-    def __init__(self, operandLeft, operandRight, operator, result):
-        self.id = 1
+    def __init__(self, id, operandLeft, operandRight, operator, result):
+        self.id = id
         self.operandLeft = operandLeft
         self.operandRight = operandRight
         self.operator = operator
@@ -27,5 +27,5 @@ class Quadruple:
         self.operator = operatorPop.top()
     
 def printQuadrupleList(quadrupleList : list):
-    for x in range(len(quadrupleList)):
-        print (quadrupleList[x]),
+    for x in quadrupleList:
+        print (x.id, x.operator, x.operandLeft, x.operandRight, x.result),
