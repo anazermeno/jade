@@ -446,13 +446,15 @@ def p_addOperand( p ):
                | ID
     '''
     operandPop.add(p[1])
+    global id
     if not operandPop.size() % 2:
         tempQuad = quadruples.Quadruple(id,'','','','')
         tempQuad.setOperandRight(operandPop)
         operandPop.pop()
         tempQuad.setOperandLeft(operandPop)
         tempQuad.setOperator(operatorPop) 
-        quadrupleList.append(tempQuad) 
+        quadrupleList.append(tempQuad)
+        id += 1
 
 def p_addFBottom( p ):
     '''
