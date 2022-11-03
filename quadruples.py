@@ -8,13 +8,12 @@ class Quadruple:
     operandRight : str
     operator : str
     result : str
-    tempCounter : int
 
-    def __init__(self, id, operandLeft, operandRight, operator, result):
+    def __init__(self, id, operator, operandLeft, operandRight, result):
         self.id = id
+        self.operator = operator
         self.operandLeft = operandLeft
         self.operandRight = operandRight
-        self.operator = operator
         self.result = result
 
     def setOperandLeft(self, operandPop : Stack) :
@@ -25,13 +24,16 @@ class Quadruple:
     
     def setOperator(self, operatorPop : Stack):
         self.operator = operatorPop.top()
+
+    def setResult(self, result : str):
+        self.result = result
     
     def setValues(self, operandPop : Stack, operatorPop : Stack) :
-        self.setOperandRight(operandPop)
+        self.operandRight = operandPop.top()
         operandPop.pop()
-        self.setOperandLeft(operandPop)
+        self.operandLeft = operandPop.top()
         operandPop.pop()
-        self.setOperator(operatorPop)
+        self.operator = operatorPop.top()
         operatorPop.pop() 
 
     def getOperandLeft(self):

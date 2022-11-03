@@ -423,12 +423,10 @@ def p_opadd( p ):
     '''
     opadd :
     '''
-    #Checar operador previo
-    if operatorStack.size() > 0 and operatorStack.top() != "(":
+    if operatorStack.size() > 0:
         if validateOperator(p[-1], operatorStack.top()):
             createQuadruple()
     operatorStack.add(p[-1])
-    print(operatorStack.items)
 
 def p_t( p ):
     '''
@@ -455,7 +453,6 @@ def p_addOperand( p ):
     '''
     if p[1] != None:
         operandStack.add(p[1])
-        print(operandStack.items)
 
 def p_addFBottom( p ):
     '''
@@ -492,7 +489,6 @@ def p_varvalue( p ):
              | CTESTRING
     '''
     operandStack.add(p[1])
-    print(operandStack.items)
 
 def p_class( p ):
     '''
@@ -559,21 +555,17 @@ def p_error( p ):
     dError = False
 
 def createQuadruple():
-    print("aqui - create")
-    print(operandStack.items)
     if operandStack.size() > 0 and operandStack.size() % 2 == 0:
-        print("aqui - después if")
         if operatorStack.top() == "=":
             assignQuadruple()
         else:
             operationQuadruple()
-    print(quadrupleList)
 
 def createTemp():
     global idTemp
     idTemp += 1
     myTemp =  "temp" + str(idTemp)
-    operandStack.add(myTemp)
+    return myTemp
 
 def assignQuadruple():
     global id
@@ -586,6 +578,9 @@ def operationQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'','','','')
     tempQuad.setValues(operandStack, operatorStack)
+    tempOperand = createTemp()
+    operandStack.add(tempOperand)
+    tempQuad.setResult(tempOperand)
     quadrupleList.append(tempQuad)
     id += 1
 
@@ -596,16 +591,16 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-var int num[4], num1;
-assign num = 2, num1 = 3;
+    a * b * d / e - c
 
-print ((num + num1));
-print ((num - num1));
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
+    print(quadrupleList[0].operator)
     quadruples.printQuadrupleList(quadrupleList)
+    print(operandStack.items)
+    print(operatorStack.items)
     
 else:
     print("Failed")
