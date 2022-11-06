@@ -216,12 +216,11 @@ def p_statement( p ):
               | forloop
               | whileloop
               | class
-              | expression
     '''
-
+    
 def p_var( p ):
     '''
-    var : VAR varType var2 SEMICOLON
+    var : VAR varType var2 endOfExp
     '''
 
 def p_varType( p ):
@@ -276,7 +275,7 @@ def p_type( p ):
 
 def p_assign( p ):
     '''
-    assign : ASSIGN assign2 SEMICOLON
+    assign : ASSIGN assign2 endOfExp
     '''
 
 def p_assign2( p ):
@@ -300,8 +299,15 @@ def p_condition( p ):
 
 def p_condition2( p ):
     '''
-    condition2 : OPARENTHESIS expression CPARENTHESIS block condition3
+    condition2 : OPARENTHESIS expression CPARENTHESIS gotoF block condition3
     '''
+
+def p_gotoF( p ):
+    '''
+    gotoF :
+    '''
+    operatorStack.add("gotoF")
+    createQuadruple()
 
 def p_condition3( p ):
     '''
@@ -312,7 +318,7 @@ def p_condition3( p ):
 
 def p_write( p ):
     '''
-    write : PRINT OPARENTHESIS write2
+    write : PRINT opadd OPARENTHESIS write2 CPARENTHESIS endOfExp
     '''
 
 def p_write2( p ):
@@ -324,12 +330,12 @@ def p_write2( p ):
 def p_write3( p ):
     '''
     write3 : COMMA write2
-           | CPARENTHESIS SEMICOLON
+           |  empty
     '''
 
 def p_read( p ):
     '''
-    read : READ ID SEMICOLON
+    read : READ ID endOfExp
     '''
 
 def p_fun( p ):
@@ -351,7 +357,7 @@ def p_fun2( p ):
 
 def p_funcall( p ):
     ''' 
-    funcall : ID OPARENTHESIS funcall2 CPARENTHESIS SEMICOLON
+    funcall : ID OPARENTHESIS funcall2 CPARENTHESIS endOfExp
     '''
 
 def p_funcall2( p ):
@@ -418,6 +424,8 @@ def p_m_exp2( p ):
            | MINUS opadd m_exp
            | empty
     '''
+    if(p[1] == None):
+        endOfExpresion()
 
 def p_opadd( p ):
     '''
@@ -439,6 +447,8 @@ def p_t2( p ):
        | DIV opadd t
        | empty
     ''' 
+    if(p[1] == None):
+        endOfExpresion()
 
 def p_f( p ):
     '''
@@ -448,7 +458,7 @@ def p_f( p ):
     
 def p_endOfExp( p ):
     '''
-    endOfExp : 
+    endOfExp : SEMICOLON
     '''
     endOfExpresion()
 
@@ -520,17 +530,17 @@ def p_obj_constructor( p ):
 
 def p_obj_declaration( p ):
     '''
-    obj_declaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS SEMICOLON
+    obj_declaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
     '''
 
 def p_obj_method_access( p ):
     '''
-    obj_method_access : OBJID DOT method SEMICOLON
+    obj_method_access : OBJID DOT method endOfExp
     '''
 
 def p_obj_attr_access( p ):
     '''
-    obj_attr_access : OBJID DOT attribute SEMICOLON
+    obj_attr_access : OBJID DOT attribute endOfExp
     '''
 
 def p_method( p ):
@@ -545,7 +555,7 @@ def p_attribute( p ):
     
 def p_return( p ):
     '''
-    return : RETURN ID SEMICOLON
+    return : RETURN ID endOfExp
     '''
     
 def p_empty( p ):
@@ -561,9 +571,13 @@ def p_error( p ):
     dError = False
 
 def createQuadruple():
-    if operandStack.size() > 0 and operandStack.size() % 2 == 0:
+    if operandStack.size() > 0:
         if operatorStack.top() == "=":
             assignQuadruple()
+        elif operatorStack.top() == "print":
+            printQuadruple()
+        elif operatorStack.top() == "gotoF":
+            gotoFQuadruple()    
         else:
             operationQuadruple()
 
@@ -590,9 +604,34 @@ def operationQuadruple():
     quadrupleList.append(tempQuad)
     id += 1
 
+def printQuadruple():
+    global id
+    tempQuad = quadruples.Quadruple(id,'','','','')
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    tempQuad.setResult(operandStack.top())
+    operandStack.pop()
+    quadrupleList.append(tempQuad)
+    id +=1
+
+def gotoFQuadruple():
+    global id
+    tempQuad = quadruples.Quadruple(id,'','','','')
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
+    # result con pila de saltos
+    quadrupleList.append(tempQuad)
+    id += 1
+    
 def endOfExpresion():
-    while operandStack.size() != 0 or operatorStack.size() != 0:
-        createQuadruple()
+    if operatorStack.size() > 0 and operatorStack.top() == "print":
+        printQuadruple() 
+    else:
+        while operandStack.size() % 2 == 0 and operatorStack.size() > 0:
+            createQuadruple()
+       
     
 # Build the parser
 parser = yacc()
@@ -601,7 +640,9 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-    a * b * d / e - c
+    if ((a * b / d * e - c) > 1) {
+        print(a);
+    }
 
 }'''
 case_TestCorrect = parser.parse(text)
