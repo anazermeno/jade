@@ -16,6 +16,7 @@ from ply.yacc import yacc
 from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
 from stack import Stack
+from virtualMemory import Memory
 import quadruples
 
 operatorStack = Stack()
@@ -177,6 +178,8 @@ def p_createDir( p ):
     global scopeStack
     scopeStack = Stack()
     scopeStack.add(programDirectory.returnId())
+    # Program memory
+    memory = Memory()
 
 def p_block( p ):
     '''
