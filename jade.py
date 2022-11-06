@@ -445,6 +445,12 @@ def p_f( p ):
     f : addFBottom expression popFBottom
       | addOperand
     '''
+    
+def p_endOfExp( p ):
+    '''
+    endOfExp : 
+    '''
+    endOfExpresion()
 
 def p_addOperand( p ):
     '''
@@ -584,6 +590,10 @@ def operationQuadruple():
     quadrupleList.append(tempQuad)
     id += 1
 
+def endOfExpresion():
+    while operandStack.size() != 0 or operatorStack.size() != 0:
+        createQuadruple()
+    
 # Build the parser
 parser = yacc()
 dError = True
@@ -597,11 +607,9 @@ program test1 {
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
-    print(quadrupleList[0].operator)
     quadruples.printQuadrupleList(quadrupleList)
     print(operandStack.items)
     print(operatorStack.items)
-    
 else:
     print("Failed")
 
