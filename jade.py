@@ -20,8 +20,8 @@ import quadruples
 
 operatorStack = Stack()
 operandStack = Stack()
-jumpsPop = Stack()
-typePop = Stack()
+jumpsStack = Stack()
+typeStack = Stack()
 
 quadrupleList = []
 
@@ -282,7 +282,8 @@ def p_assign2( p ):
     '''
     assign2 : ID OBRACKET CTEINT CBRACKET EQUAL funcall assign3
             | ID OBRACKET CTEINT CBRACKET EQUAL varvalue assign3 
-            | ID EQUAL funcall assign3 
+            | ID EQUAL funcall assign3
+            | ID EQUAL opadd expression assign3
             | ID EQUAL opadd addOperand assign3 
     '''
 
@@ -302,19 +303,58 @@ def p_condition2( p ):
     condition2 : OPARENTHESIS expression CPARENTHESIS gotoF block condition3
     '''
 
+def p_condition3( p ):
+    '''
+    condition3 : goto ELSEIF popJump condition2 
+               | goto ELSE popJump block 
+               | popJump
+    '''
+    if p[1] != None:
+        jumpsStack.add(id)
+    # else sacando saltos ??? 
+
+
+def p_saveLine( p ):
+    '''
+    saveLine : 
+    '''
+    jumpsStack.add(id)
+
 def p_gotoF( p ):
     '''
     gotoF :
     '''
     operatorStack.add("gotoF")
     createQuadruple()
+    jumpsStack.add(id-1)
 
-def p_condition3( p ):
+def p_popJump( p ):
     '''
-    condition3 : ELSEIF condition2
-               | ELSE block
-               | empty
+    popJump : 
     '''
+    if p[-1] == "else" or p[-1] == "if":
+        for i in quadrupleList:
+            if jumpsStack.size() > 0 and i.getOperator() == "gotoF" :
+                operandStack.add(id)
+                i.setOperandRight(operandStack)
+                operandStack.pop()
+                jumpsStack.pop()
+                break
+
+    for i in quadrupleList:
+        if jumpsStack.size() > 0 and i.getOperator() == "goto" :
+            operandStack.add(id+1)
+            i.setOperandRight(operandStack)
+            operandStack.pop()
+            jumpsStack.pop()
+
+def p_goto( p ):
+    '''
+    goto :
+    '''
+    operatorStack.add("goto")    
+    gotoQuadruple()
+    jumpsStack.add(id-1)
 
 def p_write( p ):
     '''
@@ -590,7 +630,12 @@ def createTemp():
 def assignQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'','','','')
-    tempQuad.setValues(operandStack, operatorStack)
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
+    tempQuad.setResult(operandStack)
+    operandStack.pop()
     quadrupleList.append(tempQuad)
     id += 1
 
@@ -624,10 +669,28 @@ def gotoFQuadruple():
     # result con pila de saltos
     quadrupleList.append(tempQuad)
     id += 1
+
+def gotoQuadruple():
+    global id
+    tempQuad = quadruples.Quadruple(id,'','','','')
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    # result con pila de saltos
+    quadrupleList.append(tempQuad)
+    id += 1
+
+def gotoTQuadruple():
+    global id
     
 def endOfExpresion():
-    if operatorStack.size() > 0 and operatorStack.top() == "print":
-        printQuadruple() 
+    #if operandStack.size() % 2 == 0 and operatorStack.size() > 0:
+        
+        
+    if operatorStack.size() > 0 and (operatorStack.top() == "print" or operatorStack.top() == "="):
+        if operatorStack.top() == "print":
+            printQuadruple()
+        else:
+            assignQuadruple()      
     else:
         while operandStack.size() % 2 == 0 and operatorStack.size() > 0:
             createQuadruple()
@@ -640,10 +703,12 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-    if ((a * b / d * e - c) > 1) {
-        print(a);
+    if (a + b > c * d) {
+        assign a = b + d;
+    } else {
+        assign a = d - c;
     }
-
+        assign b = a * c - d;
 }'''
 case_TestCorrect = parser.parse(text)
 
@@ -651,6 +716,7 @@ if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
     print(operandStack.items)
     print(operatorStack.items)
+    print(jumpsStack.items)
 else:
     print("Failed")
 

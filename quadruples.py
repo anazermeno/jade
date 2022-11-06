@@ -16,26 +16,29 @@ class Quadruple:
         self.operandRight = operandRight
         self.result = result
 
-    def setOperandLeft(self, operandPop : Stack) :
-        self.operandLeft = operandPop.top()
+    def setOperandLeft(self, operandStack : Stack) :
+        self.operandLeft = operandStack.top()
     
-    def setOperandRight(self, operandPop : Stack):
-        self.operandRight = operandPop.top()
+    def setOperandRight(self, operandStack : Stack):
+        self.operandRight = operandStack.top()
     
-    def setOperator(self, operatorPop : Stack):
-        self.operator = operatorPop.top()
+    def setOperator(self, operatorStack : Stack):
+        self.operator = operatorStack.top()
 
     def setResult(self, result : str):
         self.result = result
     
-    def setValues(self, operandPop : Stack, operatorPop : Stack) :
-        self.operandRight = operandPop.top()
-        operandPop.pop()
-        self.operandLeft = operandPop.top()
-        operandPop.pop()
-        self.operator = operatorPop.top()
-        operatorPop.pop() 
+    def setValues(self, operandStack : Stack, operatorStack : Stack) :
+        self.operandRight = operandStack.top()
+        operandStack.pop()
+        self.operandLeft = operandStack.top()
+        operandStack.pop()
+        self.operator = operatorStack.top()
+        operatorStack.pop() 
 
+    def getid(self):
+        return self.id
+    
     def getOperandLeft(self):
         return self.operandLeft
 
