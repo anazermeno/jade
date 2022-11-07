@@ -20,7 +20,7 @@ import quadruples
 
 operatorStack = Stack()
 operandStack = Stack()
-jumpsPop = Stack()
+jumpsStack = Stack()
 typePop = Stack()
 
 quadrupleList = []
@@ -294,7 +294,7 @@ def p_assign3( p ):
 
 def p_condition( p ):
     '''
-    condition : IF condition2
+    condition : IF condition2 end
     '''
 
 def p_condition2( p ):
@@ -302,19 +302,12 @@ def p_condition2( p ):
     condition2 : OPARENTHESIS expression CPARENTHESIS gotoF block condition3
     '''
 
-def p_gotoF( p ):
-    '''
-    gotoF :
-    '''
-    operatorStack.add("gotoF")
-    createQuadruple()
-
 def p_condition3( p ):
     '''
     condition3 : ELSEIF condition2
-               | ELSE block
+               | ELSE goto block
                | empty
-    '''
+    '''    
 
 def p_write( p ):
     '''
@@ -330,7 +323,7 @@ def p_write2( p ):
 def p_write3( p ):
     '''
     write3 : COMMA write2
-           |  empty
+           | empty
     '''
 
 def p_read( p ):
@@ -564,20 +557,29 @@ def p_empty( p ):
      '''
      pass
 
+def p_end( p ):
+     '''
+     end : 
+     ''' 
+     end = jumpsStack.pop()
+     fill(end, id)
+
 # Error handler for illegal syntaxis
 def p_error( p ):
     print("Syntax error at " + str(p.value))
     global dError
     dError = False
 
+##################################
+#   CREATE QUADRUPLE FUNCTIONS   #
+##################################
+
 def createQuadruple():
     if operandStack.size() > 0:
         if operatorStack.top() == "=":
             assignQuadruple()
         elif operatorStack.top() == "print":
-            printQuadruple()
-        elif operatorStack.top() == "gotoF":
-            gotoFQuadruple()    
+            printQuadruple()  
         else:
             operationQuadruple()
 
@@ -616,22 +618,46 @@ def printQuadruple():
 
 def gotoFQuadruple():
     global id
-    tempQuad = quadruples.Quadruple(id,'','','','')
-    tempQuad.setOperator(operatorStack)
-    operatorStack.pop()
-    tempQuad.setOperandLeft(operandStack)
-    operandStack.pop()
-    # result con pila de saltos
+    tempQuad = quadruples.Quadruple(id,'gotoF','','','')
+    result = operandStack.pop()
+    tempQuad.setResult(result)
     quadrupleList.append(tempQuad)
+    jumpsStack.add(id)
     id += 1
-    
+
 def endOfExpresion():
     if operatorStack.size() > 0 and operatorStack.top() == "print":
         printQuadruple() 
     else:
         while operandStack.size() % 2 == 0 and operatorStack.size() > 0:
             createQuadruple()
-       
+
+def fill(top, id):
+    for item in quadrupleList:
+        if item.id == top:
+            item.setResult(id)
+    
+##################################
+#       GOTO, GOTOF, GOTOT       #
+##################################
+
+def p_gotoF( p ):
+    '''
+    gotoF :
+    '''
+    gotoFQuadruple()
+
+def p_goto( p ):
+    '''
+    goto :
+    '''
+    global id
+    tempQuad = quadruples.Quadruple(id,'goto','','','')
+    quadrupleList.append(tempQuad)
+    false = jumpsStack.pop()
+    jumpsStack.add(id)
+    id += 1
+    fill(false, id)
     
 # Build the parser
 parser = yacc()
@@ -643,7 +669,11 @@ program test1 {
     if ((a * b / d * e - c) > 1) {
         print(a);
     }
-
+    else
+    {
+        print(c);
+    }
+    print(b);
 }'''
 case_TestCorrect = parser.parse(text)
 
@@ -651,6 +681,7 @@ if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
     print(operandStack.items)
     print(operatorStack.items)
+    print(jumpsStack.items)
 else:
     print("Failed")
 
