@@ -488,7 +488,7 @@ def p_params2( p ):
 
 def p_whileloop( p ):
     '''
-    whileloop : WHILE g_exp block
+    whileloop : WHILE whilepoint g_exp gotoF block whileend
     '''
 
 def p_varvalue( p ):
@@ -564,6 +564,29 @@ def p_end( p ):
      end = jumpsStack.pop()
      fill(end, id)
 
+##################################
+#              WHILE             #
+##################################
+
+def p_whilepoint( p ):
+     '''
+     whilepoint : 
+     ''' 
+     jumpsStack.add(id)
+
+def p_whileend( p ):
+    '''
+    whileend : 
+    ''' 
+    global id
+    end=jumpsStack.pop()
+    whileReturn=jumpsStack.pop()
+    tempQuad = quadruples.Quadruple(id,'goto','','','')
+    tempQuad.setResult(whileReturn)
+    quadrupleList.append(tempQuad)
+    id += 1 
+    fill(end, id)      
+     
 # Error handler for illegal syntaxis
 def p_error( p ):
     print("Syntax error at " + str(p.value))
@@ -674,6 +697,11 @@ program test1 {
         print(c);
     }
     print(b);
+    while(a > 0)
+    {
+        print(10);
+    }
+    print(11);
 }'''
 case_TestCorrect = parser.parse(text)
 
