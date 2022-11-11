@@ -642,8 +642,8 @@ def printQuadruple():
 def gotoFQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'gotoF','','','')
-    result = operandStack.pop()
-    tempQuad.setResult(result)
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
     quadrupleList.append(tempQuad)
     jumpsStack.add(id)
     id += 1
