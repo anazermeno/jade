@@ -21,7 +21,7 @@ import quadruples
 operatorStack = Stack()
 operandStack = Stack()
 jumpsStack = Stack()
-typePop = Stack()
+typeStack = Stack()
 
 quadrupleList = []
 
@@ -285,6 +285,7 @@ def p_assign2( p ):
             | ID EQUAL funcall assign3 
             | ID EQUAL opadd addOperand assign3 
     '''
+    #print(programDirectory.returnId())
 
 def p_assign3( p ):
     '''
@@ -361,13 +362,12 @@ def p_funcall2( p ):
 
 def p_forloop( p ):
     '''
-    forloop : FOR OPARENTHESIS ID IN forloop2 CPARENTHESIS block
+    forloop : FOR OPARENTHESIS for_id EQUAL forloop2 for_endexpid COLON p_expression for_endexpcond CPARENTHESIS block for_end
     '''
 
 def p_forloop2( p ):
     '''
-    forloop2 : ID
-             | CTEINT
+    forloop2 : p_expression
     '''
 
 def p_expression( p ):
@@ -585,7 +585,54 @@ def p_whileend( p ):
     tempQuad.setResult(whileReturn)
     quadrupleList.append(tempQuad)
     id += 1 
-    fill(end, id)      
+    fill(end, id)  
+
+##################################
+#              FOR               #
+##################################  
+
+def p_for_id( p ):
+    '''
+    for_id : ID
+    '''
+    operandStack.add(p[1])
+    #if p[-1] == "int":          #validar que sea numerico
+    #    typeStack.add(p[-1])    #se anade el tipo al stack de tipos
+    
+def p_for_endexpid( p ):
+    '''
+    for_endexpid : 
+    '''
+    #expType = typeStack.pop()
+    #if expType != "int":   validar que exp_type sea numerico
+    #   print("error")
+    
+    exp = operandStack.pop()
+    vcontrol = operandStack.top()
+    # controlType = typeStack.pop()
+    # typo_res = checktype(=,controlType,expType)
+    tempQuad = quadruples.Quadruple(id,'=',exp,'',vcontrol)
+    quadrupleList.append(tempQuad)
+    id += 1
+
+def p_for_endexpcond( p ):
+    '''
+    for_endexpcond : 
+    '''
+    #exp_type = typeStack.pop()
+    exp = operandStack.pop()
+    tempQuad = quadruples.Quadruple(id,'=',exp,'',vfinal)
+    quadrupleList.append(tempQuad)
+    id += 1
+    tempQuad = quadruples.Quadruple(id,'<',vcontrol,vfinal,tx)
+    quadrupleList.append(tempQuad)
+    id += 1
+    
+
+def p_for_end( p ):
+    '''
+    for_end : 
+    '''
      
 # Error handler for illegal syntaxis
 def p_error( p ):
@@ -686,10 +733,10 @@ def p_goto( p ):
 # Build the parser
 parser = yacc()
 dError = True
-
 print("*Test case - correct")
 text = '''
 program test1 {
+    var int num1;
     if ((a * b / d * e - c) > 1) {
         print(a);
     }
@@ -708,9 +755,7 @@ case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
-    print(operandStack.items)
-    print(operatorStack.items)
-    print(jumpsStack.items)
+    print(typeStack.items)
 else:
     print("Failed")
 
