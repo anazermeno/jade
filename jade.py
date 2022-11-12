@@ -488,7 +488,7 @@ def p_params2( p ):
 
 def p_whileloop( p ):
     '''
-    whileloop : WHILE whilepoint g_exp gotoF block whileend
+    whileloop : WHILE whilepoint g_exp CPARENTHESIS gotoF block whileend
     '''
 
 def p_varvalue( p ):
@@ -570,7 +570,7 @@ def p_end( p ):
 
 def p_whilepoint( p ):
      '''
-     whilepoint : 
+     whilepoint : OPARENTHESIS
      ''' 
      jumpsStack.add(id)
 
@@ -640,6 +640,7 @@ def printQuadruple():
     id +=1
 
 def gotoFQuadruple():
+    # Aqui vala validacion de tipo, si es bool genera cuadruplo
     global id
     tempQuad = quadruples.Quadruple(id,'gotoF','','','')
     tempQuad.setOperandLeft(operandStack)
