@@ -618,7 +618,7 @@ def p_for_endexpcond( p ):
     global vcontrol
     #expType = typeStack.pop()
     exp = operandStack.pop()
-    vfinal = 0
+    vfinal = 'vfinal' 
     tempQuad = quadruples.Quadruple(id,'=',exp,'',vfinal)
     quadrupleList.append(tempQuad)
     id += 1
@@ -630,8 +630,6 @@ def p_for_endexpcond( p ):
     id += 1
     jumpsStack.add(id-1)
     gotoFQuadruple()
-    jumpsStack.add(id-1)
-    
 
 def p_for_end( p ):
     '''
@@ -647,14 +645,16 @@ def p_for_end( p ):
     tempQuad = quadruples.Quadruple(id,'=',ty,'',vcontrol)
     quadrupleList.append(tempQuad)
     id += 1
-    tempQuad = quadruples.Quadruple(id,'=',ty,'',operandStack.top())
-    quadrupleList.append(tempQuad)
-    id += 1
+    #tempQuad = quadruples.Quadruple(id,'=',ty,'',operandStack.top())
+    #quadrupleList.append(tempQuad)
+    #id += 1
     fin = jumpsStack.pop()
     ret = jumpsStack.pop()
     tempQuad = quadruples.Quadruple(id,'goto','','',ret)
+    quadrupleList.append(tempQuad)
+    id += 1
     fill(fin,id)
-    delete = operandStack.pop()
+    delete = operandStack.pop() 
     #typDelete = typestack.pop()
 
 
@@ -762,7 +762,7 @@ print("*Test case - correct")
 text = '''
 program test1 {
     var int num;
-    for(num = 0 : num < 10){
+    for(num = 5 : 10){
         print(a);
     }
     print(b);
