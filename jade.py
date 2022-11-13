@@ -354,7 +354,7 @@ def p_funcall2( p ):
 
 def p_forloop( p ):
     '''
-    forloop : FOR OPARENTHESIS for_id EQUAL opadd expression for_endexpid COLON expression for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
+    forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON expression for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
     '''
 
 def p_expression( p ):
@@ -589,9 +589,9 @@ def p_for_id( p ):
     for_id : ID
     '''
     operandStack.add(p[1])
-    print(operandStack.items)
-    #if p[-1] == "int":          #validar que sea numerico
-    #    typeStack.add(p[-1])    #se anade el tipo al stack de tipos
+    typeStack.add("int")        #se anade el tipo al stack de tipos si es int
+    #if p[-1] == "int":          #buscar tipo en directorio
+    #    typeStack.add(p[-1])    
     
 def p_for_endexpid( p ):
     '''
@@ -605,7 +605,7 @@ def p_for_endexpid( p ):
     global vcontrol
     vcontrol = operandStack.top()
     # controlType = typeStack.pop()
-    # typo_res = checktype(=,controlType,expType)
+    # typeRes = checktype(=,controlType,expType)
     tempQuad = quadruples.Quadruple(id,'=',exp,'',vcontrol)
     quadrupleList.append(tempQuad)
     id += 1
@@ -615,9 +615,9 @@ def p_for_endexpcond( p ):
     for_endexpcond : 
     '''
     global id
-    #exp_type = typeStack.pop()
+    global vcontrol
+    #expType = typeStack.pop()
     exp = operandStack.pop()
-    global vfinal
     vfinal = 0
     tempQuad = quadruples.Quadruple(id,'=',exp,'',vfinal)
     quadrupleList.append(tempQuad)
@@ -630,6 +630,7 @@ def p_for_endexpcond( p ):
     id += 1
     jumpsStack.add(id-1)
     gotoFQuadruple()
+    jumpsStack.add(id-1)
     
 
 def p_for_end( p ):
@@ -637,6 +638,7 @@ def p_for_end( p ):
     for_end : 
     '''
     global id
+    global vcontrol
     tempQuad = quadruples.Quadruple(id,'+',vcontrol,1,'')
     ty = createTemp()
     tempQuad.setResult(ty)
@@ -652,8 +654,8 @@ def p_for_end( p ):
     ret = jumpsStack.pop()
     tempQuad = quadruples.Quadruple(id,'goto','','',ret)
     fill(fin,id)
-    elimina = operandStack.pop()
-    #tipo_elimina = typestack.pop()
+    delete = operandStack.pop()
+    #typDelete = typestack.pop()
 
 
      
@@ -763,13 +765,12 @@ program test1 {
     for(num = 0 : num < 10){
         print(a);
     }
-    print(b)
+    print(b);
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
-    print(typeStack.items)
 else:
     print("Failed")
 
