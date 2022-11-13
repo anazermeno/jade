@@ -273,6 +273,7 @@ def p_type( p ):
     '''
     programDirectory.setType(p[1])
 
+
 def p_assign( p ):
     '''
     assign : ASSIGN assign2 endOfExp
@@ -280,18 +281,9 @@ def p_assign( p ):
 
 def p_assign2( p ):
     '''
-    assign2 : ID OBRACKET CTEINT CBRACKET EQUAL funcall assign3
-            | ID OBRACKET CTEINT CBRACKET EQUAL varvalue assign3 
-            | ID EQUAL funcall assign3 
-            | ID EQUAL opadd addOperand assign3 
+    assign2 : ID EQUAL opadd addOperand 
     '''
     #print(programDirectory.returnId())
-
-def p_assign3( p ):
-    '''
-    assign3 : COMMA assign2
-            | empty
-    '''
 
 def p_condition( p ):
     '''
@@ -362,12 +354,7 @@ def p_funcall2( p ):
 
 def p_forloop( p ):
     '''
-    forloop : FOR OPARENTHESIS for_id EQUAL forloop2 for_endexpid COLON p_expression for_endexpcond CPARENTHESIS block for_end
-    '''
-
-def p_forloop2( p ):
-    '''
-    forloop2 : p_expression
+    forloop : FOR OPARENTHESIS for_id EQUAL opadd expression for_endexpid COLON expression for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
     '''
 
 def p_expression( p ):
@@ -380,6 +367,8 @@ def p_expression2( p ):
     expression2 : OR expression
                 | empty
     '''
+    if(p[1] == None):
+        endOfExpresion()
 
 def p_t_exp( p ):
     '''
@@ -391,6 +380,8 @@ def p_t_exp2( p ):
     t_exp2 : AND t_exp
            | empty
     '''
+    if(p[1] == None):
+        endOfExpresion()
 
 def p_g_exp( p ):
     '''
@@ -405,6 +396,8 @@ def p_g_exp2( p ):
            | NOTEQUAL opadd m_exp
            | empty
     '''
+    if(p[1] == None):
+        endOfExpresion()
 
 def p_m_exp( p ):
     '''
@@ -596,6 +589,7 @@ def p_for_id( p ):
     for_id : ID
     '''
     operandStack.add(p[1])
+    print(operandStack.items)
     #if p[-1] == "int":          #validar que sea numerico
     #    typeStack.add(p[-1])    #se anade el tipo al stack de tipos
     
@@ -606,8 +600,9 @@ def p_for_endexpid( p ):
     #expType = typeStack.pop()
     #if expType != "int":   validar que exp_type sea numerico
     #   print("error")
-    
+    global id
     exp = operandStack.pop()
+    global vcontrol
     vcontrol = operandStack.top()
     # controlType = typeStack.pop()
     # typo_res = checktype(=,controlType,expType)
@@ -619,20 +614,48 @@ def p_for_endexpcond( p ):
     '''
     for_endexpcond : 
     '''
+    global id
     #exp_type = typeStack.pop()
     exp = operandStack.pop()
+    global vfinal
+    vfinal = 0
     tempQuad = quadruples.Quadruple(id,'=',exp,'',vfinal)
     quadrupleList.append(tempQuad)
     id += 1
-    tempQuad = quadruples.Quadruple(id,'<',vcontrol,vfinal,tx)
+    tempQuad = quadruples.Quadruple(id,'<',vcontrol,vfinal,'')
+    tempOperand = createTemp()
+    operandStack.add(tempOperand)
+    tempQuad.setResult(tempOperand)
     quadrupleList.append(tempQuad)
     id += 1
+    jumpsStack.add(id-1)
+    gotoFQuadruple()
     
 
 def p_for_end( p ):
     '''
     for_end : 
     '''
+    global id
+    tempQuad = quadruples.Quadruple(id,'+',vcontrol,1,'')
+    ty = createTemp()
+    tempQuad.setResult(ty)
+    quadrupleList.append(tempQuad)
+    id += 1
+    tempQuad = quadruples.Quadruple(id,'=',ty,'',vcontrol)
+    quadrupleList.append(tempQuad)
+    id += 1
+    tempQuad = quadruples.Quadruple(id,'=',ty,'',operandStack.top())
+    quadrupleList.append(tempQuad)
+    id += 1
+    fin = jumpsStack.pop()
+    ret = jumpsStack.pop()
+    tempQuad = quadruples.Quadruple(id,'goto','','',ret)
+    fill(fin,id)
+    elimina = operandStack.pop()
+    #tipo_elimina = typestack.pop()
+
+
      
 # Error handler for illegal syntaxis
 def p_error( p ):
@@ -736,20 +759,11 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-    var int num1;
-    if ((a * b / d * e - c) > 1) {
+    var int num;
+    for(num = 0 : num < 10){
         print(a);
     }
-    else
-    {
-        print(c);
-    }
-    print(b);
-    while(a > 0)
-    {
-        print(10);
-    }
-    print(11);
+    print(b)
 }'''
 case_TestCorrect = parser.parse(text)
 
