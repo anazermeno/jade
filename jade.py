@@ -288,7 +288,7 @@ def p_assign2( p ):
     '''
     assign2 : ID EQUAL opadd addOperand 
     '''
-    #print(programDirectory.returnId())
+    operandStack.add(p[1])
 
 def p_condition( p ):
     '''
@@ -737,13 +737,7 @@ def p_error( p ):
 ##################################
 
 def createQuadruple():
-    if operandStack.size() > 0:
-        if operatorStack.top() == "=":
-            assignQuadruple()
-        elif operatorStack.top() == "print":
-            printQuadruple()  
-        else:
-            operationQuadruple()
+    operationQuadruple()
 
 def createTemp():
     global idTemp
@@ -795,8 +789,11 @@ def gotoFQuadruple():
     id += 1
 
 def endOfExpresion():
-    if operatorStack.size() > 0 and operatorStack.top() == "print":
-        printQuadruple() 
+    if operatorStack.size() > 0:  
+        if operatorStack.top() == "print":
+            printQuadruple()
+        elif operatorStack.top() == '=':
+            assignQuadruple()    
     else:
         while operandStack.size() % 2 == 0 and operatorStack.size() > 0:
             createQuadruple()
@@ -835,13 +832,14 @@ print("*Test case - correct")
 text = '''
 program test1 {
     var int num;
-
+    
     fun void uno(int dos) {
         print(0);
     }
 
     id(num, 2, nuum3);
-    
+    assign num = 34;
+
     for(num = 5 : 10){
         print(a);
     }
