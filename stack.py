@@ -23,4 +23,7 @@ class Stack:
     
     def popFakeBottom(self):
         self.items.pop()   
+
+    def isEmpty(self):
+        return not(self.size() > 0)    
         
