@@ -26,6 +26,7 @@ typeStack = Stack()
 quadrupleList = []
 
 id = 0
+param = 0
 idTemp = 0
 
 # Tokens
@@ -215,6 +216,7 @@ def p_statement( p ):
               | condition
               | forloop
               | whileloop
+              | funcall
               | class
     '''
     
@@ -326,7 +328,7 @@ def p_read( p ):
 
 def p_fun( p ):
     ''' 
-    fun : FUN fun2 fun_addFun OPARENTHESIS params CPARENTHESIS block
+    fun : FUN fun2 fun_addFun OPARENTHESIS funparams CPARENTHESIS block endfun
     '''
 
 def p_fun_addFun(p):
@@ -343,7 +345,7 @@ def p_fun2( p ):
 
 def p_funcall( p ):
     ''' 
-    funcall : ID OPARENTHESIS funcall2 CPARENTHESIS endOfExp
+    funcall : ID era OPARENTHESIS funcall2 CPARENTHESIS SEMICOLON gosub
     '''
 
 def p_funcall2( p ):
@@ -470,12 +472,27 @@ def p_popFBottom( p ):
 
 def p_params( p ):
     '''
-    params : type ID params2
+    params : ID addparam params2
+           | CTEINT addparam params2
+           | CTEFLOAT addparam params2
+           | empty
     '''
 
 def p_params2( p ):
     '''
     params2 : COMMA params
+            | empty
+    '''
+
+def p_funparams( p ):
+    '''
+    funparams : type ID  funparams2
+              | empty
+    '''
+
+def p_funparams2( p ):
+    '''
+    funparams2 : COMMA funparams
             | empty
     '''
 
@@ -556,6 +573,53 @@ def p_end( p ):
      ''' 
      end = jumpsStack.pop()
      fill(end, id)
+
+
+##################################
+#             MODULES            #
+##################################
+
+def p_era( p ):
+     '''
+     era : 
+     ''' 
+     global id
+     tempQuad = quadruples.Quadruple(id,'ERA','','','')
+     tempQuad.setResult(p[-1])
+     quadrupleList.append(tempQuad)
+     id += 1
+
+def p_gosub( p ):
+     '''
+     gosub : 
+     ''' 
+     global id
+     tempQuad = quadruples.Quadruple(id,'GOSUB','','','')
+     tempQuad.setResult(p[-6])
+     quadrupleList.append(tempQuad)
+     id += 1     
+
+def p_addparam( p ):
+     '''
+     addparam : 
+     ''' 
+     global id
+     tempQuad = quadruples.Quadruple(id,'PARAM','','','')
+     operandStack.add(p[-1])
+     tempQuad.setOperandLeft(operandStack)
+     operandStack.pop()
+     tempQuad.setResult(createParamTemp())
+     quadrupleList.append(tempQuad)
+     id += 1 
+
+def p_endfun( p ):
+     '''
+     endfun : 
+     ''' 
+     global id
+     tempQuad = quadruples.Quadruple(id,'ENDFUN','','','')
+     quadrupleList.append(tempQuad)
+     id += 1      
 
 ##################################
 #              WHILE             #
@@ -654,7 +718,7 @@ def p_for_end( p ):
     quadrupleList.append(tempQuad)
     id += 1
     fill(fin,id)
-    delete = operandStack.pop() 
+    operandStack.pop() 
     #typDelete = typestack.pop()
 
 
@@ -682,6 +746,12 @@ def createTemp():
     global idTemp
     idTemp += 1
     myTemp =  "temp" + str(idTemp)
+    return myTemp
+
+def createParamTemp():
+    global param
+    param += 1
+    myTemp =  "param" + str(param)
     return myTemp
 
 def assignQuadruple():
@@ -762,6 +832,13 @@ print("*Test case - correct")
 text = '''
 program test1 {
     var int num;
+
+    fun void uno(int dos) {
+        print(0);
+    }
+
+    id(num, 2, nuum3);
+    
     for(num = 5 : 10){
         print(a);
     }
