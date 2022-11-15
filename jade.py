@@ -118,12 +118,12 @@ def t_ID(t):
 
 def t_CLASSID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value,'ID') 
+    t.type = reserved.get(t.value,'CLASSID') 
     return t
 
-def t_COBJID(t):
+def t_OBJID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value,'ID') 
+    t.type = reserved.get(t.value,'OBJID') 
     return t
 
 def t_CTEFLOAT(t):
@@ -221,6 +221,9 @@ def p_statement( p ):
               | whileloop
               | funcall
               | class
+              | objdeclaration
+              | objmethodaccess
+              | objattraccess
     '''
     
 def p_var( p ):
@@ -514,13 +517,13 @@ def p_varvalue( p ):
 
 def p_class( p ):
     '''
-    class : CLASS ID OCURLY class2 class3 CCURLY
+    class : CLASS ID OCURLY class2 objconstructor class3 addclass CCURLY
     '''
 
 def p_class2( p ):
     '''
     class2 : attribute class2
-             | empty
+           | empty
     '''
 
 def p_class3( p ):
@@ -529,34 +532,40 @@ def p_class3( p ):
            | empty
     '''
 
-def p_obj_constructor( p ):
+def p_addclass( p ):
     '''
-    obj_constructor : CLASSID ID OPARENTHESIS params CPARENTHESIS block
+    addclass : empty
+    '''    
+    # Agregar a directorio
+
+def p_objconstructor( p ):
+    '''
+    objconstructor : CLASSID ID OPARENTHESIS params CPARENTHESIS block
     '''
 
-def p_obj_declaration( p ):
+def p_objdeclaration( p ):
     '''
-    obj_declaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
-    '''
-
-def p_obj_method_access( p ):
-    '''
-    obj_method_access : OBJID DOT method endOfExp
+    objdeclaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
     '''
 
-def p_obj_attr_access( p ):
+def p_objmethodaccess( p ):
     '''
-    obj_attr_access : OBJID DOT attribute endOfExp
+    objmethodaccess : ID DOT method
+    '''
+
+def p_objattraccess( p ):
+    '''
+    objattraccess : ID DOT attribute SEMICOLON
     '''
 
 def p_method( p ):
     '''
-    method : fun
+    method : funcall
     '''
 
 def p_attribute( p ):
     '''
-    attribute : var
+    attribute : varID
     '''
     
 def p_return( p ):
@@ -839,6 +848,8 @@ program test1 {
 
     id(num, 2, nuum3);
     assign num = 34;
+
+    test.funcall();
 
     for(num = 5 : 10){
         print(a);
