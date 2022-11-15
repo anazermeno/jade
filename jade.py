@@ -290,8 +290,10 @@ def p_assign( p ):
 def p_assign2( p ):
     '''
     assign2 : ID EQUAL opadd addOperand 
+            | objattraccess EQUAL opadd addOperand
     '''
-    operandStack.add(p[1])
+    if p[1] != None:
+        operandStack.add(p[1])
 
 def p_condition( p ):
     '''
@@ -552,20 +554,17 @@ def p_objmethodaccess( p ):
     '''
     objmethodaccess : ID DOT method
     '''
+    # hacer similar al acceso de atributos
 
 def p_objattraccess( p ):
     '''
-    objattraccess : ID DOT attribute SEMICOLON
+    objattraccess : ID DOT ID
     '''
+    operandStack.add(p[1] + '.' + p[3])
 
 def p_method( p ):
     '''
     method : funcall
-    '''
-
-def p_attribute( p ):
-    '''
-    attribute : varID
     '''
     
 def p_return( p ):
@@ -846,10 +845,11 @@ program test1 {
         print(0);
     }
 
-    id(num, 2, nuum3);
+    funid(num, 2, nuum3);
     assign num = 34;
 
-    test.funcall();
+    test.methodcall();
+    assign test.attribute = 2;
 
     for(num = 5 : 10){
         print(a);

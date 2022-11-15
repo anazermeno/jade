@@ -4,6 +4,7 @@
 # LOCAL INT --> 5000 - 7000
 # LOCAL FLOAT --> 7000 - 9000
 # CONSTANTS --> 9000 - 10000
+# Agregar objetos
 
 GLOBAL_INT = 1000
 GLOBAL_FLOAT = 3000
@@ -24,14 +25,14 @@ class MemoryRegistry:
     name : str
     type : str
     memoryAddress : int
-    space : int 
+    size : int 
     dimension : multiDimensionVar
 
-    def __init__(self, name, type, memoryAddress, space, dimension):
+    def __init__(self, name, type, memoryAddress, size, dimension):
         self.name = name
         self.type = type
         self.memoryAddress = memoryAddress
-        self.space = space
+        self.size = size
         self.dimension = dimension
 
 class Memory:
@@ -44,7 +45,7 @@ class Memory:
 
     memory = [GLOBAL_INT, GLOBAL_FLOAT, LOCAL_INT, LOCAL_FLOAT, CONSTANTS]
 
-    # Each element of the stacks contains a object MemoryRegistry that has name, type, memory address, space and dimension
+    # Each element of the stacks contain a object MemoryRegistry that has name, type, memory address, size and dimension
 
     def addGlobalInt(self, newGlobalInt : MemoryRegistry):
         self.memory[0] = newGlobalInt
