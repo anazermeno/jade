@@ -15,8 +15,10 @@ import ply.lex as lex
 from ply.yacc import yacc
 from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
+from virtualMachine import virtualMachine
 from stack import Stack
 from virtualMemory import Memory
+import virtualMemory
 import quadruples
 
 operatorStack = Stack()
@@ -42,6 +44,7 @@ reserved = {
     'float'   : 'FLOAT',
     'bool'    : 'BOOL',
     'mod'     : 'MOD',
+    'main'    : 'MAIN',
     'void'    : 'VOID',
     'if'      : 'IF',
     'else'    : 'ELSE',
@@ -163,7 +166,7 @@ lexer = lex.lex()
 # Functions for each grammar rule
 def p_program( p ):
     '''
-    program : PROGRAM createDir block
+    program : PROGRAM createDir OCURLY block main CCURLY
     '''    
 
 def p_createDir( p ):
@@ -176,15 +179,26 @@ def p_createDir( p ):
     programDirectory.setId(p[1])
     programDirectory.addFunction(programDirectory.returnId(), "program", 0)
     # Create scope stack
-    global scopeStack
-    scopeStack = Stack()
-    scopeStack.add(programDirectory.returnId())
+    global scopeList
+    scopeList = []
+    scopeList.append(programDirectory.returnId())
     # Program memory
-    memory = Memory()
+    #memory = Memory()
+
+def p_main( p ):
+    '''
+    main : MAIN mainScope OCURLY block4 CCURLY 
+    '''
+
+def p_mainScope( p ):
+    '''
+    mainScope : 
+    '''
+    scopeList.append("main")
 
 def p_block( p ):
     '''
-    block : OCURLY block2 block3 block4 block5 CCURLY
+    block : block2 block3 block4
     '''
 
 def p_block2( p ):
@@ -202,12 +216,6 @@ def p_block3( p ):
 def p_block4( p ):
     '''
     block4 : statement block4
-           | empty
-    '''
-
-def p_block5( p ):
-    '''
-    block5 : return
            | empty
     '''
 
@@ -232,6 +240,7 @@ def p_varType( p ):
     '''
     varType : type
     '''
+    
  
 def p_var2( p ):
     '''
@@ -255,20 +264,20 @@ def p_setVar2( p ):
     '''
     setVar2 : empty
     '''
-    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
 
 def p_setVar( p ):
     '''
     setVar : COMMA
     '''
-    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(len(scopeList)-1).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
 
 def p_varArray( p ):
     '''
     varArray : CTEINT
     '''
     size = p[1]
-    programDirectory.getVarTable(scopeStack.top()).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
+    programDirectory.getVarTable(len(scopeList)-1).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
     
 def p_type( p ):
     '''
@@ -276,7 +285,10 @@ def p_type( p ):
          | FLOAT
          | BOOL
     '''
-    programDirectory.setType(p[1])
+    if p[1] != None and p[-1] == 'var':
+        typeStack.add(p[1])
+    else:
+        programDirectory.setType(p[1])
 
 
 def p_assign( p ):
@@ -297,13 +309,13 @@ def p_condition( p ):
 
 def p_condition2( p ):
     '''
-    condition2 : OPARENTHESIS expression CPARENTHESIS gotoF block condition3
+    condition2 : OPARENTHESIS expression CPARENTHESIS gotoF OCURLY block CCURLY condition3
     '''
 
 def p_condition3( p ):
     '''
     condition3 : ELSEIF condition2
-               | ELSE goto block
+               | ELSE goto OCURLY block CCURLY
                | empty
     '''    
 
@@ -311,6 +323,7 @@ def p_write( p ):
     '''
     write : PRINT opadd OPARENTHESIS write2 CPARENTHESIS endOfExp
     '''
+    
 
 def p_write2( p ):
     '''
@@ -331,7 +344,7 @@ def p_read( p ):
 
 def p_fun( p ):
     ''' 
-    fun : FUN fun2 fun_addFun OPARENTHESIS funparams CPARENTHESIS block endfun
+    fun : FUN fun2 fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block CCURLY endfun
     '''
 
 def p_fun_addFun(p):
@@ -422,6 +435,8 @@ def p_opadd( p ):
     '''
     opadd :
     '''
+    
+    print(operatorStack.items)
     if operatorStack.size() > 0:
         if validateOperator(p[-1], operatorStack.top()):
             createQuadruple()
@@ -501,7 +516,7 @@ def p_funparams2( p ):
 
 def p_whileloop( p ):
     '''
-    whileloop : WHILE whilepoint g_exp CPARENTHESIS gotoF block whileend
+    whileloop : WHILE whilepoint g_exp CPARENTHESIS gotoF OCURLY block CCURLY whileend
     '''
 
 def p_varvalue( p ):
@@ -531,7 +546,7 @@ def p_class3( p ):
 
 def p_obj_constructor( p ):
     '''
-    obj_constructor : CLASSID ID OPARENTHESIS params CPARENTHESIS block
+    obj_constructor : CLASSID ID OPARENTHESIS params CPARENTHESIS OCURLY block CCURLY
     '''
 
 def p_obj_declaration( p ):
@@ -599,6 +614,8 @@ def p_gosub( p ):
      global id
      tempQuad = quadruples.Quadruple(id,'GOSUB','','','')
      tempQuad.setResult(p[-6])
+     global scopeList
+     scopeList.append(p[-6])
      quadrupleList.append(tempQuad)
      id += 1     
 
@@ -622,6 +639,7 @@ def p_endfun( p ):
      global id
      tempQuad = quadruples.Quadruple(id,'ENDFUN','','','')
      quadrupleList.append(tempQuad)
+     del scopeList[len(scopeList)-1]
      id += 1      
 
 ##################################
@@ -656,7 +674,7 @@ def p_for_id( p ):
     for_id : ID
     '''
     operandStack.add(p[1])
-    typeStack.add("int")        #se anade el tipo al stack de tipos si es int
+    #se anade el tipo al stack de tipos si es int
     #if p[-1] == "int":          #buscar tipo en directorio
     #    typeStack.add(p[-1])    
     
@@ -737,7 +755,8 @@ def p_error( p ):
 ##################################
 
 def createQuadruple():
-    if operandStack.size() > 0:
+
+    if operatorStack.size() > 0:
         if operatorStack.top() == "=":
             assignQuadruple()
         elif operatorStack.top() == "print":
@@ -834,23 +853,32 @@ dError = True
 print("*Test case - correct")
 text = '''
 program test1 {
-    var int num;
+    var float num;
+    var float num1;
 
     fun void uno(int dos) {
-        print(0);
+        if (a > b) {
+            print(num + num1);
+        } 
     }
 
-    id(num, 2, nuum3);
-    
-    for(num = 5 : 10){
-        print(a);
+    main {
+        id(num, 2, nuum3);
+        
+        for(num = 5 : 10){
+            print(a);
+        }
+        print(b);
     }
-    print(b);
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
+    print(scopeList)
+    print("INICIO MAQUINA VIRTUAL")
+    maquinaVirtual = virtualMachine(Memory(), quadrupleList, 0)
+    maquinaVirtual.virtualMachineStart(programDirectory)
 else:
     print("Failed")
 

@@ -1,15 +1,26 @@
 
-# GLOBAL INT --> 1000 - 3000
-# GLOBAL FLOAT --> 3000 - 5000
-# LOCAL INT --> 5000 - 7000
-# LOCAL FLOAT --> 7000 - 9000
-# CONSTANTS --> 9000 - 10000
+# Memory limits
+
+# GLOBAL INT --> 1000 - 2999
+# GLOBAL FLOAT --> 3000 - 4999
+# GLOBAL BOOL --> 5000 - 6999
+
+# LOCAL INT --> 7000 - 9999
+# LOCAL FLOAT --> 10000 11999
+# LOCAL BOOL --> 12000 13999
+
+# CONSTANTS -->  14000 - 15999
 
 GLOBAL_INT = 1000
 GLOBAL_FLOAT = 3000
-LOCAL_INT = 5000
-LOCAL_FLOAT = 7000
+GLOBAL_BOOL = 5000
+
+LOCAL_INT = 7000
+LOCAL_FLOAT = 9000
+LOCAL_BOOL = 10000
+
 CONSTANTS = 9000
+
 MAX_PER_VAR = 2000
 
 from stack import Stack
@@ -23,15 +34,17 @@ class multiDimensionVar:
 class MemoryRegistry:
     name : str
     type : str
+    scope : str
     memoryAddress : int
-    space : int 
+    size : int 
     dimension : multiDimensionVar
 
-    def __init__(self, name, type, memoryAddress, space, dimension):
+    def __init__(self, name, type, scope, memoryAddress, size, dimension):
         self.name = name
         self.type = type
+        self.scope = scope
         self.memoryAddress = memoryAddress
-        self.space = space
+        self.size = size
         self.dimension = dimension
 
 class Memory:
