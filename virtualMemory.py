@@ -1,4 +1,3 @@
-
 # Memory limits
 
 # GLOBAL INT --> 1000 - 2999
@@ -48,7 +47,7 @@ class MemoryRegistry:
         self.dimension = dimension
 
 class Memory:
-    # Stacks for Global int, Global float, Local int, Local float, Constants
+    # Arrays for Global int, Global float, Local int, Local float, Constants
     GLOBAL_INT : Stack
     GLOBAL_FLOAT : Stack
     LOCAL_INT : Stack

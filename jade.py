@@ -26,6 +26,7 @@ operandStack = Stack()
 jumpsStack = Stack()
 typeStack = Stack()
 
+operatorStack.add('end')
 quadrupleList = []
 
 id = 0
@@ -321,13 +322,13 @@ def p_condition3( p ):
 
 def p_write( p ):
     '''
-    write : PRINT opadd OPARENTHESIS write2 CPARENTHESIS endOfExp
+    write : PRINT OPARENTHESIS write2 CPARENTHESIS endOfExp
     '''
     
 
 def p_write2( p ):
     '''
-    write2 : expression write3
+    write2 : expression printparam write3
            | CTESTRING write3
     '''
 
@@ -336,6 +337,13 @@ def p_write3( p ):
     write3 : COMMA write2
            | empty
     '''
+
+def p_printparam( p ):
+    '''
+    printparam :
+    '''
+    printQuadruple()
+
 
 def p_read( p ):
     '''
@@ -379,14 +387,13 @@ def p_expression( p ):
     '''
     expression : t_exp expression2
     '''
+    endOfExpresion()
 
 def p_expression2( p ):
     '''
-    expression2 : OR expression
+    expression2 : OR opadd expression
                 | empty
     '''
-    if(p[1] == None):
-        endOfExpresion()
 
 def p_t_exp( p ):
     '''
@@ -395,11 +402,9 @@ def p_t_exp( p ):
 
 def p_t_exp2( p ):
     '''
-    t_exp2 : AND t_exp
+    t_exp2 : AND opadd t_exp
            | empty
     '''
-    if(p[1] == None):
-        endOfExpresion()
 
 def p_g_exp( p ):
     '''
@@ -414,8 +419,6 @@ def p_g_exp2( p ):
            | NOTEQUAL opadd m_exp
            | empty
     '''
-    if(p[1] == None):
-        endOfExpresion()
 
 def p_m_exp( p ):
     '''
@@ -427,20 +430,7 @@ def p_m_exp2( p ):
     m_exp2 : PLUS opadd m_exp
            | MINUS opadd m_exp
            | empty
-    '''
-    if(p[1] == None):
-        endOfExpresion()
-
-def p_opadd( p ):
-    '''
-    opadd :
-    '''
-    
-    print(operatorStack.items)
-    if operatorStack.size() > 0:
-        if validateOperator(p[-1], operatorStack.top()):
-            createQuadruple()
-    operatorStack.add(p[-1])
+    ''' 
 
 def p_t( p ):
     '''
@@ -453,8 +443,6 @@ def p_t2( p ):
        | DIV opadd t
        | empty
     ''' 
-    if(p[1] == None):
-        endOfExpresion()
 
 def p_f( p ):
     '''
@@ -475,6 +463,15 @@ def p_addOperand( p ):
     '''
     if p[1] != None:
         operandStack.add(p[1])
+
+def p_opadd( p ):
+    '''
+    opadd :
+    '''
+    if operandStack.size() > 0:
+        if validateOperator(p[-1], operatorStack.top()):
+            createQuadruple()
+    operatorStack.add(p[-1])
 
 def p_addFBottom( p ):
     '''
@@ -639,9 +636,8 @@ def p_endfun( p ):
      global id
      tempQuad = quadruples.Quadruple(id,'ENDFUN','','','')
      quadrupleList.append(tempQuad)
-     del scopeList[len(scopeList)-1]
      id += 1      
-
+     
 ##################################
 #              WHILE             #
 ##################################
@@ -755,7 +751,10 @@ def p_error( p ):
 ##################################
 
 def createQuadruple():
-    operationQuadruple()
+    if operatorStack.top() == '=':
+        assignQuadruple() 
+    else:
+        operationQuadruple()
 
 def createTemp():
     global idTemp
@@ -788,9 +787,7 @@ def operationQuadruple():
 
 def printQuadruple():
     global id
-    tempQuad = quadruples.Quadruple(id,'','','','')
-    tempQuad.setOperator(operatorStack)
-    operatorStack.pop()
+    tempQuad = quadruples.Quadruple(id,'print','','','')
     tempQuad.setResult(operandStack.top())
     operandStack.pop()
     quadrupleList.append(tempQuad)
@@ -807,14 +804,14 @@ def gotoFQuadruple():
     id += 1
 
 def endOfExpresion():
-    if operatorStack.size() > 0:  
+    if operatorStack.size() == 1:  
         if operatorStack.top() == "print":
             printQuadruple()
         elif operatorStack.top() == '=':
             assignQuadruple()    
     else:
-        while operandStack.size() % 2 == 0 and operatorStack.size() > 0:
-            createQuadruple()
+        while operandStack.size() > 1 and operatorStack.size() > 1:
+            operationQuadruple()
 
 def fill(top, id):
     for item in quadrupleList:
@@ -854,7 +851,7 @@ program test1 {
     
     fun void uno(int dos) {
         if (a > b) {
-            print(num + num1);
+            print(num + num1 * num2, a * b + c);
         } 
     }
 
@@ -862,7 +859,7 @@ program test1 {
         id(num, 2, nuum3);
         
         for(num = 5 : 10){
-            print(a);
+            print(a + b);
         }
         print(b);
     }
@@ -872,6 +869,7 @@ case_TestCorrect = parser.parse(text)
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
     print(scopeList)
+    print(operandStack.items)
     print("INICIO MAQUINA VIRTUAL")
     maquinaVirtual = virtualMachine(Memory(), quadrupleList, 0)
     maquinaVirtual.virtualMachineStart(programDirectory)
