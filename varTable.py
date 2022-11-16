@@ -19,14 +19,23 @@ class VariableTable:
     # Function to add variable to variable table
     def addVar(self, id, type, size, dir = 0) :
         if(self.validateType(type) and not self.idExist(id)):
-            newVar = {'id': id, 'type': type, 'size': size, 'dir': dir}
+            newVar = varReg(id, type, size, dir)
             table.append(newVar)
 
     def printContent(self):
         for item in table:
-            print(item)
+            print(item.id, item.type, item.size, item.dir)
 
-    # Function to get ID
+
+class varReg:
+
+    def __init__(self, id, type, size, dir = 0):
+        self.id = id
+        self.type = type
+        self.size = size
+        self.dir = dir
+
+     # Function to get ID
     def setId(self, id) :
         self.id = id
 
@@ -41,3 +50,4 @@ class VariableTable:
     # Function to retrieve type
     def returnType(self) :
         return self.type
+    

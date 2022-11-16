@@ -2,7 +2,7 @@
 # JADE
 # Ana Lizbeth Zermeño Torres     A00824913
 # Ana Carolina Arellano Alvarez  A01650945
-# October 2022
+# November 2022
 # ------------------------------------------
 
 # Import Lex and Yacc
@@ -17,8 +17,7 @@ from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
 from virtualMachine import virtualMachine
 from stack import Stack
-from virtualMemory import Memory
-import virtualMemory
+from virtualMemory import Memory, assignDir
 import quadruples
 
 operatorStack = Stack()
@@ -141,7 +140,7 @@ def t_CTEINT(t):
     return t
 
 def t_CTESTRING(t):
-    r'[a-zA-Z]'
+    r'"^[a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*$"'
     t.value = str(t.value)
     return t    
 
@@ -168,8 +167,8 @@ lexer = lex.lex()
 def p_program( p ):
     '''
     program : PROGRAM createDir OCURLY block main CCURLY
-    '''    
-
+    '''
+    
 def p_createDir( p ):
     '''
     createDir : ID
@@ -177,12 +176,12 @@ def p_createDir( p ):
     # Create global directory
     global programDirectory 
     programDirectory = FunctionDirectory()
-    programDirectory.setId(p[1])
+    programDirectory.setId("program")
     programDirectory.addFunction(programDirectory.returnId(), "program", 0)
-    # Create scope stack
     global scopeList
     scopeList = []
-    scopeList.append(programDirectory.returnId())
+    scopeList.append(programDirectory.returnId()) 
+    # Create scope stack
     # Program memory
     #memory = Memory()
 
@@ -242,7 +241,6 @@ def p_varType( p ):
     varType : type
     '''
     
- 
 def p_var2( p ):
     '''
     var2 : varID var3
@@ -265,20 +263,21 @@ def p_setVar2( p ):
     '''
     setVar2 : empty
     '''
-    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0)
+    assignDir(scopeList[len(scopeList)-1], programDirectory.returnType())
 
 def p_setVar( p ):
     '''
     setVar : COMMA
     '''
-    programDirectory.getVarTable(len(scopeList)-1).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
 
 def p_varArray( p ):
     '''
     varArray : CTEINT
     '''
     size = p[1]
-    programDirectory.getVarTable(len(scopeList)-1).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
+    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
     
 def p_type( p ):
     '''
@@ -288,8 +287,8 @@ def p_type( p ):
     '''
     if p[1] != None and p[-1] == 'var':
         typeStack.add(p[1])
-    else:
-        programDirectory.setType(p[1])
+
+    programDirectory.setType(p[1])
 
 
 def p_assign( p ):
@@ -329,7 +328,7 @@ def p_write( p ):
 def p_write2( p ):
     '''
     write2 : expression printparam write3
-           | CTESTRING write3
+           | CTESTRING printstring write3
     '''
 
 def p_write3( p ):
@@ -343,6 +342,15 @@ def p_printparam( p ):
     printparam :
     '''
     printQuadruple()
+
+def p_printstring( p ):
+    '''
+    printstring :
+    '''
+    global id
+    tempQuad = quadruples.Quadruple(id,'print','','',p[-1])
+    quadrupleList.append(tempQuad)
+    id +=1
 
 
 def p_read( p ):
@@ -359,7 +367,11 @@ def p_fun_addFun(p):
     '''
     fun_addFun : ID
     '''
-    # aqui va la funcion
+    programDirectory.setId(p[1])
+    programDirectory.setType(p[-1])
+    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0)
+    scopeList.append(p[1])
+    
 
 def p_fun2( p ):
     '''
@@ -851,7 +863,7 @@ program test1 {
     
     fun void uno(int dos) {
         if (a > b) {
-            print(num + num1 * num2, a * b + c);
+            print(a + b + c);
         } 
     }
 
@@ -872,7 +884,7 @@ if(dError == True):
     print(operandStack.items)
     print("INICIO MAQUINA VIRTUAL")
     maquinaVirtual = virtualMachine(Memory(), quadrupleList, 0)
-    maquinaVirtual.virtualMachineStart(programDirectory)
+    programDirectory.printContent()
 else:
     print("Failed")
 

@@ -20,8 +20,5 @@ def validateOperator(operatorNew, operatorStack):
             return True
         else:
             return False
-    elif operatorNew == "print" :
-        if operatorStack == None:
-            return True
-        else:
-            return False
+    else:
+        return False

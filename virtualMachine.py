@@ -9,7 +9,7 @@ class virtualMachine:
         self.quadruples = quadruples
         self.ip = ip
     
-    def virtualMachineStart(self, functionDir : FunctionDirectory):
+    def virtualMachineStart(self, functionDir : FunctionDirectory, quadruple : quadruples):
         for quadruple in self.quadruples:
             currId =quadruple.getId()
             currOperator = quadruple.getOperator()

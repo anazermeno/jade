@@ -32,7 +32,6 @@ class FunctionDirectory:
 
     def printContent(self):
         for value in directory:
-            print(value)
             if type(directory[value]) is dict:
                 for item in directory[value]:
                     if item == "varsTable":
