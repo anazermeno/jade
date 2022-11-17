@@ -28,14 +28,14 @@ cLOCAL_BOOL = 0
 CONSTANTDIR = 9000
 cCONSTANTS = 0
 
+
 class Memory:
 
-    def assignDir(scope : str, type : str):
+    def assignDir(scope: str, type: str):
         global GLOBAL_INT, GLOBAL_FLOAT, GLOBAL_BOOL
         global cGLOBAL_INT, cGLOBAL_FLOAT, cGLOBAL_BOOL
         global LOCAL_INT, LOCAL_FLOAT, LOCAL_BOOL
         global cLOCAL_INT, cLOCAL_FLOAT, cLOCAL_BOOL
-
 
         if scope == "program":
             if type == "int" and GLOBAL_INT < 2999:
@@ -69,10 +69,11 @@ class Memory:
                 cCONSTANTS += 1
                 return CONSTANTDIR
         else:
-            return 0 
+            return 0
+
 
 class multiDimensionVar:
-    limInf : int
-    limSup : int
-    dim : int
-    nextDim : bool
+    limInf: int
+    limSup: int
+    dim: int
+    nextDim: bool
