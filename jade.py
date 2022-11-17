@@ -803,7 +803,7 @@ def operationQuadruple():
     if CUBE.get(typeL) != None:
         if CUBE.get(typeL).get(typeR).get(operatorStack.top()) == -1:
             print("Error, no coinciden los tipos")
-        else:    
+        else:
             tempQuad.setValues(operandStack, operatorStack)
             tempOperand = createTemp()
             operandStack.add(tempOperand)
@@ -811,7 +811,7 @@ def operationQuadruple():
             quadrupleList.append(tempQuad)
             id += 1
     else:
-        print("error")   
+        print("error en el tipo de operador")
 
 def printQuadruple():
     global id
@@ -885,6 +885,8 @@ program test1 {
     }
 
     assign i = 0;
+    assign prueba1 = 10;
+
     main {
         function(num2);
         print(num + num2);
