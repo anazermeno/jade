@@ -872,28 +872,8 @@ def p_goto(p):
 parser = yacc()
 dError = True
 print("*Test case - correct")
-text = '''
-program test1 {
-    var float num;
-    var int prueba1;
-    var bool unid;
-
-    var int i;
-
-    fun void funcion(){
-        var float num2;
-    }
-
-    assign i = 0;
-    assign prueba1 = 10;
-
-    main {
-        function(num2);
-        print(num + num2);
-    }
-
-}'''
-case_TestCorrect = parser.parse(text)
+f = open("ejemplo.ja", "r")
+case_TestCorrect = parser.parse(f.read())
 
 if (dError == True):
     print("Compilando...")

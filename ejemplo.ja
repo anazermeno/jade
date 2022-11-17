@@ -1,0 +1,20 @@
+program test1 {
+    var float num;
+    var int prueba1;
+    var bool unid;
+
+    var int i;
+
+    fun void funcion(){
+        var float num2;
+    }
+
+    assign i = 0;
+    assign prueba1 = 10;
+
+    main {
+        function(num2);
+        print(num + num2);
+    }
+
+}
