@@ -294,6 +294,7 @@ def p_assign2(p):
             programDirectory.getVarTable().getItem(p[1]).returnType())
     else:
         print("Error: La variable no ha sido declarada antes de su uso")
+        exit
 
 def p_condition(p):
     '''
@@ -464,6 +465,7 @@ def p_addOperand(p):
                 programDirectory.getVarTable().getItem(p[1]).returnType())
         else:
             print("Error: La variable no ha sido declarada antes de su uso")
+            exit()
 
 def p_opadd(p):
     '''
@@ -535,6 +537,7 @@ def p_varvalue(p):
             typeStack.add(itemType)
         else:
             print("Error: el tipo de variable no coincide con el valor asignado ")
+            exit()
 
 def p_class(p):
     '''
@@ -639,6 +642,7 @@ def p_addparam(p):
             programDirectory.getVarTable().getItem(p[-1]).returnType())
     else:
         print("Error en parámetros")
+        exit()
 
     tempQuad.setOperandLeft(operandStack)
     operandStack.pop()
@@ -691,6 +695,7 @@ def p_for_id(p):
             programDirectory.getVarTable().getItem(p[1]).returnType())
     else:
         print("Error: No se ha declarado la variable contadora")
+        exit()
 
 def p_for_endexpid(p):
     '''
@@ -812,6 +817,7 @@ def operationQuadruple():
             id += 1
     else:
         print("error en el tipo de operador")
+        exit()
 
 def printQuadruple():
     global id
@@ -888,7 +894,7 @@ program test1 {
     assign prueba1 = 10;
 
     main {
-        function(num2);
+        function(nodef);
         print(num + num2);
     }
 
