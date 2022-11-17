@@ -6,9 +6,10 @@ class VariableTable:
         table = [] #empty matrix
         
     def idExist(self, id) :
-        if id in table:
-            return True
-        return False
+        for item in table:
+            if item.id == id:
+                return True        
+        return False    
 
     # Function to validate type
     def validateType(self, type) :
@@ -26,7 +27,12 @@ class VariableTable:
         for item in table:
             item.printItem()
 
-
+    def getItem(self, id):
+        for item in table:
+            if item.id == id:
+                return item        
+        return False    
+        
 class varReg:
 
     def __init__(self, id, type, size, scope, dir = 0):

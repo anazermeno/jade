@@ -243,9 +243,7 @@ def p_var( p ):
     vardir = Memory.assignDir(currScope, p[2])
     name = p[3]
     if currScope == "program" or currScope == "local":
-        if programDirectory.getVarTable(currScope) != False:
-            programDirectory.getVarTable(currScope).addVar(name, p[2], 0, currScope, vardir)
-        #programDirectory.printContent()
+        programDirectory.getVarTable().addVar(name, p[2], 0, currScope, vardir)
 #def p_var3( p ):
 #    '''
 #    var3 : setVar var2
@@ -253,13 +251,12 @@ def p_var( p ):
 #         | setVar2
 #    '''     
 
-
 def p_varArray( p ):
     '''
     varArray : CTEINT
     '''
     size = p[1]
-    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
+    programDirectory.getVarTable().addVar(programDirectory.returnId(), programDirectory.returnType(), size, 0) 
     
 def p_type( p ):
     '''
@@ -282,7 +279,10 @@ def p_assign2( p ):
     '''
     assign2 : ID EQUAL opadd addOperand 
     '''
-    operandStack.add(p[1])
+    if programDirectory.getVarTable().idExist(p[1]):
+        operandStack.add(p[1])
+    else:
+        print("Error: La variable no ha sido declarada antes de su uso")
 
 def p_condition( p ):
     '''
@@ -447,7 +447,10 @@ def p_addOperand( p ):
                | ID
     '''
     if p[1] != None:
-        operandStack.add(p[1])
+        if programDirectory.getVarTable().idExist(p[1]):
+            operandStack.add(p[1])
+        else:
+            print("Error: La variable no ha sido declarada antes de su uso")
 
 def p_opadd( p ):
     '''
@@ -507,7 +510,16 @@ def p_varvalue( p ):
              | CTEFLOAT
              | CTESTRING
     '''
-    operandStack.add(p[1])
+    if programDirectory.getVarTable().idExist(p[-3]):
+        itemType = programDirectory.getVarTable().getItem(p[-3]).returnType()
+        myType = str(type(p[1]))
+        newType = myType[8:11]
+        if itemType == newType:
+            operandStack.add(p[1])
+        elif myType[8:12] == newType:
+            operandStack.add(p[1])
+        else:
+            print("Error: el tipo de variable no coincide con el valor asignado ")        
 
 def p_class( p ):
     '''
@@ -517,7 +529,7 @@ def p_class( p ):
 def p_class2( p ):
     '''
     class2 : attribute class2
-             | empty
+            | empty
     '''
 
 def p_class3( p ):
@@ -654,6 +666,7 @@ def p_for_id( p ):
     '''
     for_id : ID
     '''
+
     operandStack.add(p[1])
     #se anade el tipo al stack de tipos si es int
     #if p[-1] == "int":          #buscar tipo en directorio
@@ -745,6 +758,9 @@ def createTemp():
     global idTemp
     idTemp += 1
     myTemp =  "temp" + str(idTemp)
+    currScope = scopeList[len(scopeList)-1]
+    vardir = Memory.assignDir(currScope, "int") #cambiar para enviar verdadero tipo
+    programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
 
 def createParamTemp():
@@ -843,19 +859,18 @@ program test1 {
     }
 
     main {
-        print(a+b);
-        print(b);
+        print(num + prueba1);
+        assign num2 = 5;
     }
 
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
-    quadruples.printQuadrupleList(quadrupleList)
-    programDirectory.printContent()
-    #print("INICIO MAQUINA VIRTUAL")
-    
-    maquinaVirtual = virtualMachine(programDirectory, quadrupleList, 0)
+    #quadruples.printQuadrupleList(quadrupleList)
+    print("INICIO MAQUINA VIRTUAL")
+    maquinaVirtual = virtualMachine(programDirectory.returnDirectory(), quadrupleList)
+    maquinaVirtual.virtualMachineStart()
 else:
     print("Failed")
 

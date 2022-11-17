@@ -25,7 +25,7 @@ cLOCAL_FLOAT = 0
 LOCAL_BOOL = 10000
 cLOCAL_BOOL = 0
 
-CONSTANTS = 9000
+CONSTANTDIR = 9000
 cCONSTANTS = 0
 
 class Memory:
@@ -63,6 +63,11 @@ class Memory:
                 LOCAL_BOOL += 1
                 cLOCAL_BOOL += 1
                 return LOCAL_BOOL
+        elif scope == "constant":
+            if type == "constannt" and CONSTANTDIR < 9000:
+                CONSTANTDIR += 1
+                cCONSTANTS += 1
+                return CONSTANTDIR
         else:
             return 0 
 

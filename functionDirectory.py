@@ -24,10 +24,8 @@ class FunctionDirectory:
             directoryTemp = {id : {'type': type, 'size': size, 'varsTable': VariableTable()}} 
             directory.update(directoryTemp)
 
-    def getVarTable(self, id):
-        if directory.get(id) == None:
-            return False
-        return directory.get(id)["varsTable"]
+    def getVarTable(self):
+        return directory.get("program")["varsTable"]
 
     def emptyDirectory(self):
         directory.clear()
@@ -42,6 +40,10 @@ class FunctionDirectory:
     def setId(self, id) :
         self.id = id
 
+    # Function to retrieve type
+    def returnDirectory(self) :
+        return directory.get("program")["varsTable"] 
+
     # Function to retrieve ID
     def returnId(self) :
         return self.id
@@ -49,7 +51,7 @@ class FunctionDirectory:
     # Function to get type
     def setType(self, type) :
         self.type = type
-    
+
     # Function to retrieve type
     def returnType(self) :
         return self.type

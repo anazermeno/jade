@@ -1,12 +1,12 @@
-from functionDirectory import FunctionDirectory
+from varTable import VariableTable
 
 class virtualMachine:
-    def __init__(self, directory : FunctionDirectory(), quadruples : list, ip : int):
+    def __init__(self, directory : VariableTable(), quadruples : list):
         self.directory = directory
         self.quadruples = quadruples
-        self.ip = ip
     
     def virtualMachineStart(self):
+        print(self.directory.printContent()) 
         for quadruple in self.quadruples:
             currId =quadruple.getId()
             currOperator = quadruple.getOperator()
@@ -14,4 +14,7 @@ class virtualMachine:
             currOpRight= quadruple.getOperandRight()
             currResult= quadruple.getResult()
             print(currId, currOperator, currOpLeft, currOpRight, currResult)
-        print(self.directory)        
+
+    def solveQuadruples(self):
+        print("hello world")        
+               
