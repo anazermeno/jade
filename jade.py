@@ -24,8 +24,7 @@ operatorStack = Stack()
 operandStack = Stack()
 jumpsStack = Stack()
 typeStack = Stack()
-
-operatorStack.add('end')
+funIds = []
 quadrupleList = []
 
 id = 0
@@ -86,7 +85,8 @@ tokens = [
     'CTEINT',
     'CTEFLOAT',
     'CTESTRING',
-    'COMMENT'
+    'COMMENT',
+    'QUOTE'
 ] + list(reserved.values())
 
 # Ignore
@@ -112,6 +112,7 @@ t_GREATERTHAN = r'\>'
 t_EQUAL = r'\='
 t_NOTEQUAL = r'\!='
 t_ISEQUAL = r'\=='
+t_QUOTE = r'\"'
 
 
 def t_ID(t):
@@ -145,7 +146,7 @@ def t_CTEINT(t):
 
 
 def t_CTESTRING(t):
-    r'"^[a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*$"'
+    r'^[a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*$'
     t.value = str(t.value)
     return t
 
@@ -286,7 +287,7 @@ def p_assign(p):
 
 def p_assign2(p):
     '''
-    assign2 : ID EQUAL opadd addOperand 
+    assign2 : ID EQUAL opadd assign3 
     '''
     if programDirectory.getVarTable().idExist(p[1]):
         operandStack.add(p[1])
@@ -295,6 +296,12 @@ def p_assign2(p):
     else:
         print("Error: La variable no ha sido declarada antes de su uso")
         exit
+
+def p_assign3(p):
+    '''
+    assign3 : addOperand
+            | expression
+    '''
 
 def p_condition(p):
     '''
@@ -334,6 +341,7 @@ def p_printparam(p):
     '''
     printparam :
     '''
+    endOfExpresion()
     printQuadruple()
 
 def p_printstring(p):
@@ -362,6 +370,7 @@ def p_fun_addFun(p):
     '''
     programDirectory.setType(p[1])
     scopeList.append("local")
+    funIds.append([p[2], id])
 
 def p_funcall(p):
     ''' 
@@ -390,7 +399,6 @@ def p_expression2(p):
     expression2 : OR opadd expression
                 | empty
     '''
-
 
 def p_t_exp(p):
     '''
@@ -471,9 +479,11 @@ def p_opadd(p):
     '''
     opadd :
     '''
-    if operandStack.size() > 0:
+    if operandStack.size() > 0 and operatorStack.size() > 0:
         if validateOperator(p[-1], operatorStack.top()):
             createQuadruple()
+        elif operatorStack.size() == 0:
+            createQuadruple()    
     operatorStack.add(p[-1])
 
 def p_addFBottom(p):
@@ -525,6 +535,7 @@ def p_varvalue(p):
              | CTEFLOAT
              | CTESTRING
     '''
+    # Caso: asignación de variables assign num = 3 y num(id) es int
     if programDirectory.getVarTable().idExist(p[-3]):
         itemType = programDirectory.getVarTable().getItem(p[-3]).returnType()
         myType = str(type(p[1]))
@@ -624,9 +635,12 @@ def p_gosub(p):
     '''
     global id
     tempQuad = quadruples.Quadruple(id, 'GOSUB', '', '', '')
-    tempQuad.setResult(p[-6])  # Cambiar por direccion
+    for item in funIds:
+        if item[0] == p[-6]:
+            tempQuad.setResult(item[1])
+      # Cambiar por direccion
     global scopeList
-    scopeList.append(p[-6])
+    scopeList.append("local")
     quadrupleList.append(tempQuad)
     id += 1
 
@@ -781,8 +795,8 @@ def createTemp():
     global idTemp
     idTemp += 1
     myTemp = "temp" + str(idTemp)
+    
     currScope = scopeList[len(scopeList)-1]
-    # cambiar para enviar verdadero tipo
     vardir = Memory.assignDir(currScope, "int")
     programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
@@ -800,7 +814,12 @@ def createParamTemp():
 def assignQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id, '', '', '', '')
-    tempQuad.setValues(operandStack, operatorStack)
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
+    tempQuad.setResult(operandStack.top())
+    operandStack.pop()
     quadrupleList.append(tempQuad)
     id += 1
 
@@ -812,6 +831,7 @@ def operationQuadruple():
     if CUBE.get(typeL) != None:
         if CUBE.get(typeL).get(typeR).get(operatorStack.top()) == -1:
             print("Error, no coinciden los tipos")
+            exit()
         else:
             tempQuad.setValues(operandStack, operatorStack)
             tempOperand = createTemp()
@@ -842,13 +862,10 @@ def gotoFQuadruple():
     id += 1
 
 def endOfExpresion():
-    if operatorStack.size() == 1:
-        if operatorStack.top() == "print":
-            printQuadruple()
-        elif operatorStack.top() == '=':
+    while operandStack.size() >= 1 and operatorStack.size() > 0:
+        if operatorStack.top() == '=':
             assignQuadruple()
-    else:
-        while operandStack.size() > 1 and operatorStack.size() > 1:
+        else:
             operationQuadruple()
 
 def fill(top, id):
@@ -887,29 +904,31 @@ program test1 {
     var float num;
     var int prueba1;
     var bool unid;
-
     var int i;
 
     fun void funcion(){
         var float num2;
+        print(num2);
     }
 
     assign i = 0;
-    assign prueba1 = 1;
-    assign num = 10.12334;
+    assign num = 10.0;
     assign num2 = 12.34231;
 
     main {
-        function(num);
-        print(num + num2);
+        funcion(num);
         print(num - num2);
         print(num / num2);
+        print(num + num2);
     }
 
 }'''
 case_TestCorrect = parser.parse(text)
 
 if (dError == True):
+    print(operatorStack.items)
+    for i in quadrupleList:
+        print(i.id, " ", i.getOperator(), " ", i.getOperandLeft(), " ", i.getOperandRight(), " ", i.getResult())
     print("Compilando...")
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList)
