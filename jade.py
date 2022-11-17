@@ -798,16 +798,20 @@ def assignQuadruple():
 def operationQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id, '', '', '', '')
-    opL = operandStack.pop()
-    opR = operandStack.top()
-    # print(CUBE["int"]["int"][operatorStack.top()])
-    operandStack.add(opL)
-    tempQuad.setValues(operandStack, operatorStack)
-    tempOperand = createTemp()
-    operandStack.add(tempOperand)
-    tempQuad.setResult(tempOperand)
-    quadrupleList.append(tempQuad)
-    id += 1
+    typeL = typeStack.pop()
+    typeR = typeStack.top()
+    if CUBE.get(typeL) != None:
+        if CUBE.get(typeL).get(typeR).get(operatorStack.top()) == -1:
+            print("Error, no coinciden los tipos")
+        else:    
+            tempQuad.setValues(operandStack, operatorStack)
+            tempOperand = createTemp()
+            operandStack.add(tempOperand)
+            tempQuad.setResult(tempOperand)
+            quadrupleList.append(tempQuad)
+            id += 1
+    else:
+        print("error")   
 
 def printQuadruple():
     global id
@@ -872,6 +876,7 @@ text = '''
 program test1 {
     var float num;
     var int prueba1;
+    var bool unid;
 
     var int i;
 
@@ -883,7 +888,7 @@ program test1 {
     main {
         function(num2);
         print(num + num2);
-        print(prueba1 + num2);
+        print(prueba1 + unid);
     }
 
 }'''
