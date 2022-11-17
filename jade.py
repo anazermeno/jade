@@ -890,15 +890,13 @@ program test1 {
     main {
         function(num2);
         print(num + num2);
-        print(prueba1 + unid);
     }
 
 }'''
 case_TestCorrect = parser.parse(text)
 
 if (dError == True):
-    # quadruples.printQuadrupleList(quadrupleList)
-    print("INICIO MAQUINA VIRTUAL")
+    print("Compilando...")
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList)
     maquinaVirtual.virtualMachineStart()

@@ -63,7 +63,7 @@ class varReg:
     def returnType(self):
         return self.type
 
-    # Function to retrieve type
+    # Function to retrieve virtual dir
     def returnDir(self):
         return self.dir
 
