@@ -14,3 +14,4 @@ class virtualMachine:
             currOpRight= quadruple.getOperandRight()
             currResult= quadruple.getResult()
             print(currId, currOperator, currOpLeft, currOpRight, currResult)
+        print(self.directory)        

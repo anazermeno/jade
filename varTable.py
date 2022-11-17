@@ -21,11 +21,10 @@ class VariableTable:
         if(self.validateType(type) and not self.idExist(id)):
             newVar = varReg(id, type, size, scope, dir)
             table.append(newVar)
-            print(newVar.returnId(), newVar.returnType(), newVar.size, newVar.returnScope(), newVar.returnDir())
 
     def printContent(self):
         for item in table:
-            print(item.returnId(), item.returnType(), item.size, item.returnScope(), item.returnDir())
+            item.printItem()
 
 
 class varReg:
@@ -60,4 +59,8 @@ class varReg:
     # Function to retrieve type
     def returnDir(self) :
         return self.dir
+
+    def printItem(self):
+        print(self.id, self.type, self.size, self.scope, self.dir)
+
     

@@ -17,7 +17,7 @@ from functionDirectory import FunctionDirectory
 from semanticCube import CUBE
 from virtualMachine import virtualMachine
 from stack import Stack
-from virtualMemory import Memory, assignDir
+from virtualMemory import Memory
 import quadruples
 
 operatorStack = Stack()
@@ -178,6 +178,7 @@ def p_createDir( p ):
     programDirectory = FunctionDirectory()
     programDirectory.setId("program")
     programDirectory.addFunction(programDirectory.returnId(), "program", 0)
+    programDirectory.addFunction("local", "local", 0)
     global scopeList
     scopeList = []
     scopeList.append(programDirectory.returnId()) 
@@ -195,6 +196,7 @@ def p_mainScope( p ):
     mainScope : 
     '''
     scopeList.append("local")
+    programDirectory.setType("main")
 
 def p_block( p ):
     '''
@@ -233,45 +235,24 @@ def p_statement( p ):
     
 def p_var( p ):
     '''
-    var : VAR varType var2 endOfExp
-    '''
-
-def p_varType( p ):
-    '''
-    varType : type
-    '''
-    
-def p_var2( p ):
-    '''
-    var2 : varID var3
-    ''' 
-    
-def p_varID( p ):
-    '''
-    varID : ID
-    '''
-    programDirectory.setId(p[1])
-
-def p_var3( p ):
-    '''
-    var3 : setVar var2
-         | OBRACKET varArray CBRACKET COMMA var2
-         | setVar2
-    '''     
-
-def p_setVar2( p ):
-    '''
-    setVar2 : empty
+    var : VAR INT ID endOfExp
+        | VAR FLOAT ID endOfExp
+        | VAR BOOL ID endOfExp
     '''
     currScope = scopeList[len(scopeList)-1]
-    vardir = assignDir(currScope, programDirectory.returnType())
-    programDirectory.getVarTable(currScope).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, currScope, vardir)
-    
-def p_setVar( p ):
-    '''
-    setVar : COMMA
-    '''
-    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0) 
+    vardir = Memory.assignDir(currScope, p[2])
+    name = p[3]
+    if currScope == "program" or currScope == "local":
+        if programDirectory.getVarTable(currScope) != False:
+            programDirectory.getVarTable(currScope).addVar(name, p[2], 0, currScope, vardir)
+        #programDirectory.printContent()
+#def p_var3( p ):
+#    '''
+#    var3 : setVar var2
+#         | OBRACKET varArray CBRACKET COMMA var2
+#         | setVar2
+#    '''     
+
 
 def p_varArray( p ):
     '''
@@ -353,7 +334,6 @@ def p_printstring( p ):
     quadrupleList.append(tempQuad)
     id +=1
 
-
 def p_read( p ):
     '''
     read : READ ID endOfExp
@@ -369,9 +349,7 @@ def p_fun_addFun(p):
     fun_addFun : type ID
                | VOID ID
     '''
-    programDirectory.setId(p[2])
     programDirectory.setType(p[1])
-    programDirectory.addFunction(programDirectory.returnId(),programDirectory.returnType(), 0)
     scopeList.append("local")
 
 def p_funcall( p ):
@@ -785,9 +763,10 @@ def assignQuadruple():
 def operationQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'','','','')
-    #opL = operandStack.pop()
+    opL = operandStack.pop()
     opR = operandStack.top()
-    #print(CUBE[][type(operandStack.top())]str(operatorStack.top())])
+    #print(CUBE["int"]["int"][operatorStack.top()])
+    operandStack.add(opL)
     tempQuad.setValues(operandStack, operatorStack)
     tempOperand = createTemp()
     operandStack.add(tempOperand)
@@ -857,20 +836,26 @@ print("*Test case - correct")
 text = '''
 program test1 {
     var float num;
-    var int prueba, prueba2;
+    var int prueba1;
+
+    fun void funcion(){
+        var float num2;
+    }
 
     main {
-        assign b = 5;
-        assign c = b;
+        print(a+b);
+        print(b);
     }
+
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
+    programDirectory.printContent()
     #print("INICIO MAQUINA VIRTUAL")
-    #maquinaVirtual = virtualMachine(programDirectory, quadrupleList, 0)
-    #programDirectory.printContent()
+    
+    maquinaVirtual = virtualMachine(programDirectory, quadrupleList, 0)
 else:
     print("Failed")
 
