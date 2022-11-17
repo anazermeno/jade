@@ -7,7 +7,6 @@ class virtualMachine:
         self.ip = ip
     
     def virtualMachineStart(self):
-
         for quadruple in self.quadruples:
             currId =quadruple.getId()
             currOperator = quadruple.getOperator()
