@@ -2,7 +2,6 @@ program test1 {
     var float num;
     var int prueba1;
     var bool unid;
-
     var int i;
 
     fun void funcion(){
@@ -10,11 +9,12 @@ program test1 {
     }
 
     assign i = 0;
-    assign prueba1 = 10;
+    assign num = 10.0;
+    assign num2 = 12.34231;
 
     main {
-        function(num2);
-        print(num + num2);
+        function(num);
+        print(num - num2);
+        print(num / num2);
+        print(num - num2);
     }
-
-}
