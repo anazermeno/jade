@@ -12,27 +12,29 @@ class VariableTable:
 
     # Function to validate type
     def validateType(self, type) :
-        if type != 'object'  and type != 'int'  and type != 'float' and type != 'bool':
+        if type != 'object' and type != 'int'  and type != 'float' and type != 'bool':
             return False
         return True   
     
     # Function to add variable to variable table
-    def addVar(self, id, type, size, dir = 0) :
+    def addVar(self, id, type, size, scope, dir = 0) :
         if(self.validateType(type) and not self.idExist(id)):
-            newVar = varReg(id, type, size, dir)
+            newVar = varReg(id, type, size, scope, dir)
             table.append(newVar)
+            print(newVar.returnId(), newVar.returnType(), newVar.size, newVar.returnScope(), newVar.returnDir())
 
     def printContent(self):
         for item in table:
-            print(item.id, item.type, item.size, item.dir)
+            print(item.returnId(), item.returnType(), item.size, item.returnScope(), item.returnDir())
 
 
 class varReg:
 
-    def __init__(self, id, type, size, dir = 0):
+    def __init__(self, id, type, size, scope, dir = 0):
         self.id = id
         self.type = type
         self.size = size
+        self.scope = scope
         self.dir = dir
 
      # Function to get ID
@@ -43,6 +45,10 @@ class varReg:
     def returnId(self) :
         return self.id
 
+    # Function to retrieve ID
+    def returnScope(self) :
+        return self.scope    
+
     # Function to get type
     def setType(self, type) :
         self.type = type
@@ -50,4 +56,8 @@ class varReg:
     # Function to retrieve type
     def returnType(self) :
         return self.type
+        
+    # Function to retrieve type
+    def returnDir(self) :
+        return self.dir
     

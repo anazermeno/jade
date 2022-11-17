@@ -194,7 +194,7 @@ def p_mainScope( p ):
     '''
     mainScope : 
     '''
-    scopeList.append("main")
+    scopeList.append("local")
 
 def p_block( p ):
     '''
@@ -263,9 +263,10 @@ def p_setVar2( p ):
     '''
     setVar2 : empty
     '''
-    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0)
-    assignDir(scopeList[len(scopeList)-1], programDirectory.returnType())
-
+    currScope = scopeList[len(scopeList)-1]
+    vardir = assignDir(currScope, programDirectory.returnType())
+    programDirectory.getVarTable(currScope).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, currScope, vardir)
+    
 def p_setVar( p ):
     '''
     setVar : COMMA
@@ -360,24 +361,18 @@ def p_read( p ):
 
 def p_fun( p ):
     ''' 
-    fun : FUN fun2 fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block CCURLY endfun
+    fun : FUN fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block CCURLY endfun
     '''
 
 def p_fun_addFun(p):
     '''
-    fun_addFun : ID
+    fun_addFun : type ID
+               | VOID ID
     '''
-    programDirectory.setId(p[1])
-    programDirectory.setType(p[-1])
-    programDirectory.getVarTable(scopeList[len(scopeList)-1]).addVar(programDirectory.returnId(), programDirectory.returnType(), 0, 0)
-    scopeList.append(p[1])
-    
-
-def p_fun2( p ):
-    '''
-    fun2 : type 
-        | VOID
-    '''
+    programDirectory.setId(p[2])
+    programDirectory.setType(p[1])
+    programDirectory.addFunction(programDirectory.returnId(),programDirectory.returnType(), 0)
+    scopeList.append("local")
 
 def p_funcall( p ):
     ''' 
@@ -622,7 +617,7 @@ def p_gosub( p ):
      ''' 
      global id
      tempQuad = quadruples.Quadruple(id,'GOSUB','','','')
-     tempQuad.setResult(p[-6])
+     tempQuad.setResult(p[-6]) # Cambiar por direccion
      global scopeList
      scopeList.append(p[-6])
      quadrupleList.append(tempQuad)
@@ -790,6 +785,9 @@ def assignQuadruple():
 def operationQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id,'','','','')
+    #opL = operandStack.pop()
+    opR = operandStack.top()
+    #print(CUBE[][type(operandStack.top())]str(operatorStack.top())])
     tempQuad.setValues(operandStack, operatorStack)
     tempOperand = createTemp()
     operandStack.add(tempOperand)
@@ -859,32 +857,20 @@ print("*Test case - correct")
 text = '''
 program test1 {
     var float num;
-    var float num1;
-    
-    fun void uno(int dos) {
-        if (a > b) {
-            print(a + b + c);
-        } 
-    }
+    var int prueba, prueba2;
 
     main {
-        id(num, 2, nuum3);
-        
-        for(num = 5 : 10){
-            print(a + b);
-        }
-        print(b);
+        assign b = 5;
+        assign c = b;
     }
 }'''
 case_TestCorrect = parser.parse(text)
 
 if(dError == True):
     quadruples.printQuadrupleList(quadrupleList)
-    print(scopeList)
-    print(operandStack.items)
-    print("INICIO MAQUINA VIRTUAL")
-    maquinaVirtual = virtualMachine(Memory(), quadrupleList, 0)
-    programDirectory.printContent()
+    #print("INICIO MAQUINA VIRTUAL")
+    #maquinaVirtual = virtualMachine(programDirectory, quadrupleList, 0)
+    #programDirectory.printContent()
 else:
     print("Failed")
 

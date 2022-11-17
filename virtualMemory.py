@@ -25,6 +25,7 @@ LOCAL_BOOL = 10000
 cLOCAL_BOOL = 0
 
 CONSTANTS = 9000
+cCONSTANTS = 0
 
 MAX_PER_VAR = 2000
 
@@ -36,51 +37,9 @@ class multiDimensionVar:
     dim : int
     nextDim : bool
 
-class MemoryRegistry:
-    name : str
-    type : str
-    scope : str
-    memoryAddress : int
-    size : int 
-    dimension : multiDimensionVar
-
-    def __init__(self, name, type, scope, memoryAddress, size, dimension):
-        self.name = name
-        self.type = type
-        self.scope = scope
-        self.memoryAddress = memoryAddress
-        self.size = size
-        self.dimension = dimension
-
 class Memory:
     # Arrays for Global int, Global float, Local int, Local float, Constants
     # Function with param var type, var scope and return var direction, updates var, and add to stack
-    GLOBAL_INT : Stack
-    GLOBAL_FLOAT : Stack
-    GLOBAL_BOOL : Stack
-    LOCAL_INT : Stack
-    LOCAL_FLOAT : Stack
-    LOCAL_BOOL : Stack
-    CONSTANTS : Stack
-
-    memory = [GLOBAL_INT, GLOBAL_FLOAT, LOCAL_INT, LOCAL_FLOAT, CONSTANTS]
-
-    # Each element of the stacks contains a object MemoryRegistry that has name, type, memory address, space and dimension
-
-    def addGlobalInt(self, newGlobalInt : MemoryRegistry):
-        self.memory[0] = newGlobalInt
-    
-    def addGlobalFloat(self, newGlobalFloat : MemoryRegistry):
-        self.memory[1] = newGlobalFloat
-
-    def addLocalInt(self, newLocalInt : MemoryRegistry):
-        self.memory[2] = newLocalInt
-
-    def addLocalFloat(self, newLocalFloat : MemoryRegistry):
-        self.memory[3] = newLocalFloat
-    
-    def addConstant(self, constant : MemoryRegistry):
-        self.memory[4] = constant
 
     # Individual functions to clean stacks
     def resetGlobalInt(self):
@@ -110,15 +69,15 @@ def assignDir(scope : str, type : str):
     global cLOCAL_INT, cLOCAL_FLOAT, cLOCAL_BOOL
 
     if scope == "program":
-        if type == "int":
+        if type == "int" and GLOBAL_INT < 3000:
             GLOBAL_INT += 1
             cGLOBAL_INT += 1
             return GLOBAL_INT
-        elif type == "float":
+        elif type == "float" and GLOBAL_FLOAT < 5000:
             GLOBAL_FLOAT += 1
             cGLOBAL_FLOAT += 1
             return GLOBAL_FLOAT
-        elif type == "bool":
+        elif type == "bool" and GLOBAL_BOOL < 7000:
             GLOBAL_BOOL += 1
             cGLOBAL_BOOL += 1
             return GLOBAL_BOOL
@@ -140,9 +99,9 @@ def assignDir(scope : str, type : str):
 
 # Function to clean Memory
 def resetVars(memory : Memory):
-    Memory.resetGlobalInt()
-    Memory.resetGlobalFloat()
-    Memory.resetLocalInt()
-    Memory.resetLocalFloat()
-    Memory.resetConstants()
+    memory.resetGlobalInt()
+    memory.resetGlobalFloat()
+    memory.resetLocalInt()
+    memory.resetLocalFloat()
+    memory.resetConstants()
 

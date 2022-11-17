@@ -10,7 +10,7 @@ class FunctionDirectory:
         directory = {}
 
     def validateType(self, type) :
-        if type != 'function' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool' and type !="program":
+        if type != 'void' and type != 'class' and type != 'object'  and type != 'int'  and type != 'float' and type != 'bool' and type !="program":
             return False
         return True   
 
@@ -32,6 +32,7 @@ class FunctionDirectory:
 
     def printContent(self):
         for value in directory:
+            print(value)
             if type(directory[value]) is dict:
                 for item in directory[value]:
                     if item == "varsTable":
@@ -41,7 +42,7 @@ class FunctionDirectory:
                         print(item, ':', directory[value][item])
 
     def TraverseVarTable(self, id):
-        directory.get(id)["varsTable"].printContent()
+        print(directory.get(id)["varsTable"].printContent())
 
     # Function to get ID
     def setId(self, id) :
