@@ -532,7 +532,7 @@ def p_varvalue(p):
         if itemType == newType:
             operandStack.add(p[1])
             typeStack.add(itemType)
-        elif myType[8:12] == newType:
+        elif itemType == myType[8:13]:
             operandStack.add(p[1])
             typeStack.add(itemType)
         else:
@@ -791,6 +791,10 @@ def createParamTemp():
     global param
     param += 1
     myTemp = "param" + str(param)
+    currScope = scopeList[len(scopeList)-1]
+    # cambiar para enviar verdadero tipo
+    vardir = Memory.assignDir(currScope, "int")
+    programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
 
 def assignQuadruple():
@@ -891,11 +895,15 @@ program test1 {
     }
 
     assign i = 0;
-    assign prueba1 = 10;
+    assign prueba1 = 1;
+    assign num = 10.12334;
+    assign num2 = 12.34231;
 
     main {
-        function(nodef);
+        function(num);
         print(num + num2);
+        print(num - num2);
+        print(num / num2);
     }
 
 }'''

@@ -7,17 +7,28 @@ class virtualMachine:
         self.directory = directory
         self.quadruples = quadruples
         self.memory = Memory()
-
+        self.assignedVars = {}
 
     def jadeSum(self, left, right):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        print("aqui", leftDir, rightDir)
+        result = 0
+        for i in self.assignedVars:
+            if i == leftDir or i == rightDir:
+                result += self.assignedVars.get(i) 
+        print("Resultado Suma: ", result)
 
     def jadeSub(self, left, right):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        print("aqui", leftDir, rightDir)
+        vara = 0
+        varb = 0
+        for i in self.assignedVars:
+            if i == leftDir:
+                vara += self.assignedVars.get(i)
+            if i == rightDir:
+                varb += self.assignedVars.get(i)     
+        print("Resultado Resta: ", vara - varb)
 
     def jadeMult(self, left, right):
         leftDir = self.directory.getItem(left).returnDir()
@@ -27,28 +38,41 @@ class virtualMachine:
     def jadeDiv(self, left, right):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        print("aqui", leftDir, rightDir)
+        vara = 0
+        varb = 0
+        for i in self.assignedVars:
+            if i == leftDir:
+                vara += self.assignedVars.get(i)
+            if i == rightDir:
+                varb += self.assignedVars.get(i)     
+        print("Resultado División: ", vara/varb)
 
     def jadeRead(self, left, right):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
         print("aqui", leftDir, rightDir)
 
-    def jadeWrite(self, res):
-        print("hola", res.getResult())             
+    def jadeWrite(self, quadruple):
+        print(quadruple.getOperandRight())
+        #dir = self.directory.getItem(quadruple).returnDir()
+        for i in self.assignedVars:
+            if i == dir:
+                print(self.assignedVars.get(i))   
 
     def virtualMachineStart(self):
         for quadruple in self.quadruples:
             if quadruple.getOperator() == '+':
                 self.jadeSum(quadruple.getOperandLeft(), quadruple.getOperandRight())
             elif quadruple.getOperator() == '-':
-                print("resta")
+                self.jadeSub(quadruple.getOperandLeft(), quadruple.getOperandRight())
             elif quadruple.getOperator() == '*':
                 print("multiplicacion")
             elif quadruple.getOperator() == '/':
-                print("división")
+                self.jadeDiv(quadruple.getOperandLeft(), quadruple.getOperandRight())
             elif quadruple.getOperator() == '=':
-                print("asignación")
+                dir = self.directory.getItem(quadruple.getOperandRight()).returnDir()
+                obj = {dir : quadruple.getOperandLeft()}
+                self.assignedVars.update(obj)
             elif quadruple.getOperator() == 'ENDFUN':
                 print("fin de funcion")  
             elif quadruple.getOperator() == 'ERA':
@@ -58,4 +82,5 @@ class virtualMachine:
             elif quadruple.getOperator() == 'GOSUB':
                 print("gosub")
             elif quadruple.getOperator() == 'print':
+                print("Aqui: ", quadruple.getOperator())
                 self.jadeWrite(quadruple)                                    
