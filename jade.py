@@ -635,10 +635,14 @@ def p_gosub(p):
     '''
     global id
     tempQuad = quadruples.Quadruple(id, 'GOSUB', '', '', '')
+    found = False
     for item in funIds:
         if item[0] == p[-6]:
             tempQuad.setResult(item[1])
-      # Cambiar por direccion
+            found = not found
+    if found == False:
+        print("Error: la función aún no ha sido definida")
+        exit()  # Cambiar por direccion
     global scopeList
     scopeList.append("local")
     quadrupleList.append(tempQuad)
@@ -899,36 +903,11 @@ def p_goto(p):
 parser = yacc()
 dError = True
 print("*Test case - correct")
-text = '''
-program test1 {
-    var float num;
-    var int prueba1;
-    var bool unid;
-    var int i;
 
-    fun void funcion(){
-        var float num2;
-        print(num2);
-    }
-
-    assign i = 0;
-    assign num = 10.0;
-    assign num2 = 12.34231;
-
-    main {
-        funcion(num);
-        print(num - num2);
-        print(num / num2);
-        print(num + num2);
-    }
-
-}'''
-case_TestCorrect = parser.parse(text)
+f = open("ejemplo.ja", "r")
+case_TestCorrect = parser.parse(f.read())
 
 if (dError == True):
-    print(operatorStack.items)
-    for i in quadrupleList:
-        print(i.id, " ", i.getOperator(), " ", i.getOperandLeft(), " ", i.getOperandRight(), " ", i.getResult())
     print("Compilando...")
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList)
