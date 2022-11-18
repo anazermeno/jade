@@ -196,12 +196,17 @@ def p_createDir(p):
     global scopeList
     scopeList = []
     scopeList.append(programDirectory.returnId())
+    global id
+    tempQuad = quadruples.Quadruple(id, 'goto', '', '', '')
+    quadrupleList.append(tempQuad)
+    id +=1
 
 def p_main(p):
     '''
-    main : MAIN mainScope OCURLY block4 CCURLY 
+    main : MAIN mainScope OCURLY block2 CCURLY 
     '''
-
+    quadrupleList[0].setResult(id)
+    
 def p_mainScope(p):
     '''
     mainScope : 
@@ -211,24 +216,16 @@ def p_mainScope(p):
 
 def p_block(p):
     '''
-    block : block2 block3 block4
+    block : var block
+          | fun block
+          | statement block
+          | empty
     '''
 
 def p_block2(p):
     '''
-    block2 : var block2
-           | empty
-    '''
-
-def p_block3(p):
-    '''
-    block3 : fun block3
-           | empty
-    '''
-
-def p_block4(p):
-    '''
-    block4 : statement block4
+    block2 : statement block2
+           | var block2
            | empty
     '''
 
@@ -927,13 +924,16 @@ def p_goto(p):
 # Build the parser
 parser = yacc()
 dError = True
-print("*Test case - correct")
 
-f = open("ejemplo.ja", "r")
+f = open("ejemplo_aritmetico.ja", "r")
+print("Ejemplo arimético")
 case_TestCorrect = parser.parse(f.read())
 
+#f2 = open("ejemplo_funciones.ja", "r")
+#print("Ejemplo funciones")
+#case_TestCorrect2 = parser.parse(f2.read())
+
 if (dError == True):
-    print("Compilando...")
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()

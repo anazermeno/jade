@@ -1,0 +1,13 @@
+program test1 {
+    var float num;
+    var float num2;
+    assign num = 10.0;
+
+    main {
+        assign num2 = 12.3;
+        print(num - num2);
+        print(num / num2 * num - num);
+        print(num + num2 + num);
+    }
+
+}

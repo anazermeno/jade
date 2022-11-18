@@ -7,9 +7,8 @@ class virtualMachine:
         self.directory = directory
         self.quadruples = quadruples
         self.eraData = eraData
-        self.memory = Memory()
         self.assignedVars = {}
-        self.globalbreadcrumb = 0
+        self.tempbreadcrumb = 0
 
     def jadeSum(self, left, right, opresult):
         leftDir = self.directory.getItem(left).returnDir()
@@ -75,15 +74,20 @@ class virtualMachine:
             obj = {self.directory.getItem(result).returnDir(): (vara/varb)}
             self.assignedVars.update(obj)
 
+    def jadeGoSub(self):        
+        while self.quadruples[self.tempbreadcrumb+1].getOperator() != 'ENDFUN' and self.tempbreadcrumb < len(self.quadruples):
+            self.ExecuteQuadruple(self.quadruples[self.tempbreadcrumb])
+            self.tempbreadcrumb += 1
+
     def jadeWrite(self, var):
-        if var[0:4] == "temp":
+        if var[0:4] == "temp" or var.isdigit() == False:
             content =  self.directory.getItem(var).returnDir()
             print(self.assignedVars.get(content))
         else:
             if self.assignedVars.get(var) != None:
                 print(self.assignedVars.get(var))
             else:
-                print("Error: la variable que se intentó imprimir aún no es definida")    
+                print("Error: la variable que se intentó imprimir aún no tiene un valor")    
 
     def ExecuteQuadruple(self, quadruple):
         if quadruple.getOperator() == '+':
@@ -101,18 +105,16 @@ class virtualMachine:
             dir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
             obj = {dir: quadruple.getResult()}
             self.assignedVars.update(obj)
-        elif quadruple.getOperator() == 'ENDFUN':
-            print("endfunc")
         elif quadruple.getOperator() == 'ERA':
             print("era ", quadruple.getResult())
         elif quadruple.getOperator() == 'PARAM':
             print("parámetro", quadruple.getOperandLeft(),quadruple.getResult())
         elif quadruple.getOperator() == 'GOSUB':
-            print("gosub", quadruple.getResult())
+            self.tempbreadcrumb = quadruple.getResult()
+            self.jadeGoSub()
         elif quadruple.getOperator() == 'print':
             self.jadeWrite(quadruple.getResult())
 
     def virtualMachineStart(self):
         for quadruple in self.quadruples:
-            self.globalbreadcrumb = quadruple.getId()
             self.ExecuteQuadruple(quadruple)
