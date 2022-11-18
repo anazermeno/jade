@@ -3,9 +3,10 @@ from virtualMemory import Memory
 
 
 class virtualMachine:
-    def __init__(self, directory: VariableTable(), quadruples: list):
+    def __init__(self, directory: VariableTable(), quadruples: list, eraData: list):
         self.directory = directory
         self.quadruples = quadruples
+        self.eraData = eraData
         self.memory = Memory()
         self.assignedVars = {}
 
@@ -87,16 +88,17 @@ class virtualMachine:
             obj = {dir: quadruple.getResult()}
             self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'ENDFUN':
-            print("fin de funcion")
+            print("endfunc")
         elif quadruple.getOperator() == 'ERA':
-            print("era")
+            print("era ", quadruple.getResult())
         elif quadruple.getOperator() == 'PARAM':
-            print("parámetro")
+            print("parámetro", quadruple.getOperandLeft(),quadruple.getResult())
         elif quadruple.getOperator() == 'GOSUB':
-            print("gosub")
+            print("gosub", quadruple.getResult())
         elif quadruple.getOperator() == 'print':
             self.jadeWrite(quadruple.getResult())
 
     def virtualMachineStart(self):
+        print(self.eraData)
         for quadruple in self.quadruples:
             self.ExecuteQuadruple(quadruple)

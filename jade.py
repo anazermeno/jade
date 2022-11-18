@@ -26,6 +26,7 @@ jumpsStack = Stack()
 typeStack = Stack()
 funIds = []
 quadrupleList = []
+eraData = []
 
 id = 0
 param = 0
@@ -371,6 +372,9 @@ def p_fun_addFun(p):
     programDirectory.setType(p[1])
     scopeList.append("local")
     funIds.append([p[2], id])
+    eraData.append([p[2], []])
+    global currFun 
+    currFun= p[2]
 
 def p_funcall(p):
     ''' 
@@ -514,9 +518,19 @@ def p_params2(p):
 
 def p_funparams(p):
     '''
-    funparams : type ID  funparams2
+    funparams : addType ID  funparams2
               | empty
     '''
+
+def p_addType(p):
+    '''
+    addType : INT
+           | FLOAT
+           | BOOL
+    '''
+    for i in eraData:
+        if i[0] == currFun:
+            i[1].append(p[1])
 
 def p_funparams2(p):
     '''
@@ -625,6 +639,9 @@ def p_era(p):
     '''
     global id
     tempQuad = quadruples.Quadruple(id, 'ERA', '', '', '')
+    for item in funIds:
+        if item[0] == p[-1]:
+            tempQuad.setResult(item[1])
     tempQuad.setResult(p[-1])
     quadrupleList.append(tempQuad)
     id += 1
@@ -799,10 +816,18 @@ def createTemp():
     global idTemp
     idTemp += 1
     myTemp = "temp" + str(idTemp)
-    
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, "int")
     programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
+    return myTemp
+
+def createTempFun(newType):
+    global idTemp
+    idTemp += 1
+    myTemp = "temp" + str(idTemp)
+    currScope = scopeList[len(scopeList)-1]
+    vardir = Memory.assignDir(currScope, "int")
+    programDirectory.getVarTable().addVar(myTemp, newType, 0, currScope, vardir)
     return myTemp
 
 def createParamTemp():
@@ -833,12 +858,13 @@ def operationQuadruple():
     typeL = typeStack.pop()
     typeR = typeStack.top()
     if CUBE.get(typeL) != None:
-        if CUBE.get(typeL).get(typeR).get(operatorStack.top()) == -1:
+        result = CUBE.get(typeL).get(typeR).get(operatorStack.top())
+        if result == -1:
             print("Error, no coinciden los tipos")
             exit()
         else:
             tempQuad.setValues(operandStack, operatorStack)
-            tempOperand = createTemp()
+            tempOperand = createTempFun(result)
             operandStack.add(tempOperand)
             tempQuad.setResult(tempOperand)
             quadrupleList.append(tempQuad)
@@ -886,7 +912,6 @@ def p_gotoF(p):
     '''
     gotoFQuadruple()
 
-
 def p_goto(p):
     '''
     goto :
@@ -910,7 +935,7 @@ case_TestCorrect = parser.parse(f.read())
 if (dError == True):
     print("Compilando...")
     maquinaVirtual = virtualMachine(
-        programDirectory.returnDirectory(), quadrupleList)
+        programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
 else:
     print("Failed")
