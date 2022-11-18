@@ -9,10 +9,15 @@ class virtualMachine:
         self.eraData = eraData
         self.memory = Memory()
         self.assignedVars = {}
+        self.globalbreadcrumb = 0
 
     def jadeSum(self, left, right, opresult):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
+        if right[0:4] == "temp":
+            rightDir = self.directory.getItem(right).returnDir()
+        if left[0:4] == "temp":
+            leftDir = self.directory.getItem(left).returnDir()   
         result = 0
         for i in self.assignedVars:
             if i == leftDir or i == rightDir:
@@ -25,6 +30,8 @@ class virtualMachine:
         rightDir = self.directory.getItem(right).returnDir()
         if right[0:4] == "temp":
             rightDir = self.directory.getItem(right).returnDir()
+        if left[0:4] == "temp":
+            leftDir = self.directory.getItem(left).returnDir()    
         vara = 0
         varb = 0
         for i in self.assignedVars:
@@ -38,7 +45,19 @@ class virtualMachine:
     def jadeMult(self, left, right, result):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        print("aqui", leftDir, rightDir)
+        if right[0:4] == "temp":
+            rightDir = self.directory.getItem(right).returnDir()
+        if left[0:4] == "temp":
+            leftDir = self.directory.getItem(left).returnDir()    
+        vara = 0
+        varb = 0
+        for i in self.assignedVars:
+            if i == leftDir:
+                vara += self.assignedVars.get(i)
+            if i == rightDir:
+                varb += self.assignedVars.get(i)
+        obj = {self.directory.getItem(result).returnDir(): (vara * varb)}
+        self.assignedVars.update(obj)
 
     def jadeDiv(self, left, right, result):
         leftDir = self.directory.getItem(left).returnDir()
@@ -55,12 +74,6 @@ class virtualMachine:
         else:
             obj = {self.directory.getItem(result).returnDir(): (vara/varb)}
             self.assignedVars.update(obj)
-
-    def jadeRead(self, left, right):
-        print("en read virtual machine")
-        leftDir = self.directory.getItem(left).returnDir()
-        rightDir = self.directory.getItem(right).returnDir()
-        print("aqui", leftDir, rightDir)
 
     def jadeWrite(self, var):
         if var[0:4] == "temp":
@@ -79,7 +92,8 @@ class virtualMachine:
             return self.jadeSub(quadruple.getOperandLeft(),
                                     quadruple.getOperandRight(), quadruple.getResult())
         elif quadruple.getOperator() == '*':
-            print("multiplicacion")
+            return self.jadeMult(quadruple.getOperandLeft(),
+                                    quadruple.getOperandRight(), quadruple.getResult())
         elif quadruple.getOperator() == '/':
             self.jadeDiv(quadruple.getOperandLeft(),
                              quadruple.getOperandRight(), quadruple.getResult())
@@ -99,6 +113,6 @@ class virtualMachine:
             self.jadeWrite(quadruple.getResult())
 
     def virtualMachineStart(self):
-        print(self.eraData)
         for quadruple in self.quadruples:
+            self.globalbreadcrumb = quadruple.getId()
             self.ExecuteQuadruple(quadruple)

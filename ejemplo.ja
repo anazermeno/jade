@@ -4,19 +4,23 @@ program test1 {
     var bool unid;
     var int i;
 
-    fun void funcion(){
+    fun void funcion(int b, bool c){
+        var float num2;
+    }
+
+    fun void funcion2(){
         var float num2;
     }
 
     assign i = 0;
     assign num = 10.0;
-    assign num2 = 12.34231;
+    assign num2 = 12.3;
 
     main {
-        function(num);
+        funcion(num, unid);
         print(num - num2);
-        print(num / num2);
-        print(num - num2);
+        print(num / num2 * num - num);
+        print(num + num2 + num);
     }
 
 }
