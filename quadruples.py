@@ -36,6 +36,9 @@ class Quadruple:
         self.operator = operatorPop.top()
         operatorPop.pop() 
 
+    def getId(self):
+        return self.id
+
     def getOperandLeft(self):
         return self.operandLeft
 
@@ -44,6 +47,9 @@ class Quadruple:
 
     def getOperator(self):        
         return self.operator
+
+    def getResult(self):        
+        return self.result    
 
 def printQuadrupleList(quadrupleList : list):
     for x in quadrupleList:

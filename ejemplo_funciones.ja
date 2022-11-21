@@ -1,0 +1,16 @@
+program test2 {
+    var int num3;
+
+    fun void imprimeuno(){
+        assign num3 = 3390;
+        print(num3);
+    }
+
+    main {
+        var int ejemplo;
+        assign ejemplo = 20;
+        print(ejemplo);
+        imprimeuno();
+    }
+
+}
