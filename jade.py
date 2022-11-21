@@ -37,8 +37,8 @@ reserved = {
     'program': 'PROGRAM',
     'class': 'CLASS',
     'var': 'VAR',
-    'array' : 'ARRAY',
-    'matrix' : 'MATRIX',
+    'array': 'ARRAY',
+    'matrix': 'MATRIX',
     'assign': 'ASSIGN',
     'fun': 'FUN',
     'return': 'RETURN',
@@ -180,10 +180,12 @@ lexer = lex.lex()
 # Parser
 # Functions for each grammar rule
 
+
 def p_program(p):
     '''
     program : PROGRAM createDir OCURLY block main CCURLY
     '''
+
 
 def p_createDir(p):
     '''
@@ -201,13 +203,15 @@ def p_createDir(p):
     global id
     tempQuad = quadruples.Quadruple(id, 'goto', '', '', '')
     quadrupleList.append(tempQuad)
-    id +=1
+    id += 1
+
 
 def p_main(p):
     '''
     main : MAIN mainScope OCURLY block2 CCURLY 
     '''
-    
+
+
 def p_mainScope(p):
     '''
     mainScope : 
@@ -215,6 +219,7 @@ def p_mainScope(p):
     scopeList.append("local")
     programDirectory.setType("main")
     quadrupleList[0].setResult(id)
+
 
 def p_block(p):
     '''
@@ -226,6 +231,7 @@ def p_block(p):
           | empty
     '''
 
+
 def p_block2(p):
     '''
     block2 : statement block2
@@ -234,6 +240,7 @@ def p_block2(p):
            | varMatrix block2
            | empty
     '''
+
 
 def p_statement(p):
     '''
@@ -249,6 +256,7 @@ def p_statement(p):
               | class
     '''
 
+
 def p_var(p):
     '''
     var : VAR INT ID endOfExp
@@ -260,19 +268,15 @@ def p_var(p):
     name = p[3]
     if currScope == "program" or currScope == "local":
         programDirectory.getVarTable().addVar(name, p[2], 0, currScope, vardir)
-# def p_var3( p ):
-#    '''
-#    var3 : setVar var2
-#         | OBRACKET varArray CBRACKET COMMA var2
-#         | setVar2
-#    '''
 
-def p_varArray( p ):
+
+def p_varArray(p):
     '''
     varArray : VAR ARRAY INT ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
             | VAR ARRAY FLOAT ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
             | VAR ARRAY BOOL ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
     '''
+
 
 def p_varArray2(p):
     '''
@@ -282,12 +286,15 @@ def p_varArray2(p):
     programDirectory.getVarTable().addVar(programDirectory.returnId(),
                                           programDirectory.returnType(), size, 0)
 
-def p_varMatrix( p ):
+
+def p_varMatrix(p):
     '''
     varMatrix : VAR MATRIX INT ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
               | VAR MATRIX FLOAT ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
               | VAR MATRIX BOOL ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
     '''
+
+
 def p_type(p):
     '''
     type : INT
@@ -299,10 +306,12 @@ def p_type(p):
 
     programDirectory.setType(p[1])
 
+
 def p_assign(p):
     '''
     assign : ASSIGN assign2 endOfExp
     '''
+
 
 def p_assign2(p):
     '''
@@ -316,31 +325,37 @@ def p_assign2(p):
         print("Error: La variable no ha sido declarada antes de su uso")
         exit
 
+
 def p_assign3(p):
     '''
     assign3 : addOperand
             | expression
     '''
 
-def p_assignArray( p ):
+
+def p_assignArray(p):
     '''
     assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL expression
     '''
 
-def p_assignMatrix( p ):
+
+def p_assignMatrix(p):
     '''
     assignMatrix : ASSIGN MATRIX ID OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET EQUAL expression
     '''
-    
+
+
 def p_condition(p):
     '''
     condition : IF condition2 end
     '''
 
+
 def p_condition2(p):
     '''
     condition2 : OPARENTHESIS expression CPARENTHESIS gotoF OCURLY block CCURLY condition3
     '''
+
 
 def p_condition3(p):
     '''
@@ -349,10 +364,12 @@ def p_condition3(p):
                | empty
     '''
 
+
 def p_write(p):
     '''
     write : PRINT OPARENTHESIS write2 CPARENTHESIS endOfExp
     '''
+
 
 def p_write2(p):
     '''
@@ -360,11 +377,13 @@ def p_write2(p):
            | CTESTRING printstring write3
     '''
 
+
 def p_write3(p):
     '''
     write3 : COMMA write2
            | empty
     '''
+
 
 def p_printparam(p):
     '''
@@ -372,6 +391,7 @@ def p_printparam(p):
     '''
     endOfExpresion()
     printQuadruple()
+
 
 def p_printstring(p):
     '''
@@ -382,15 +402,18 @@ def p_printstring(p):
     quadrupleList.append(tempQuad)
     id += 1
 
+
 def p_read(p):
     '''
     read : READ ID endOfExp
     '''
 
+
 def p_fun(p):
     ''' 
     fun : FUN fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block CCURLY endfun
     '''
+
 
 def p_fun_addFun(p):
     '''
@@ -401,13 +424,16 @@ def p_fun_addFun(p):
     scopeList.append("local")
     funIds.append([p[2], id])
     eraData.append([p[2], []])
-    global currFun 
-    currFun= p[2]
+    global currFun
+    currFun = p[2]
+
 
 def p_funcall(p):
     ''' 
     funcall : ID era OPARENTHESIS funcall2 CPARENTHESIS SEMICOLON gosub
     '''
+    currFun = p[1]
+
 
 def p_funcall2(p):
     ''' 
@@ -415,10 +441,12 @@ def p_funcall2(p):
              | empty
     '''
 
+
 def p_forloop(p):
     '''
     forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON expression for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
     '''
+
 
 def p_expression(p):
     '''
@@ -426,16 +454,19 @@ def p_expression(p):
     '''
     endOfExpresion()
 
+
 def p_expression2(p):
     '''
     expression2 : OR opadd expression
                 | empty
     '''
 
+
 def p_t_exp(p):
     '''
     t_exp : g_exp t_exp2
     '''
+
 
 def p_t_exp2(p):
     '''
@@ -443,10 +474,12 @@ def p_t_exp2(p):
            | empty
     '''
 
+
 def p_g_exp(p):
     '''
     g_exp : m_exp g_exp2
     '''
+
 
 def p_g_exp2(p):
     '''
@@ -457,10 +490,12 @@ def p_g_exp2(p):
            | empty
     '''
 
+
 def p_m_exp(p):
     '''
     m_exp : t m_exp2
     '''
+
 
 def p_m_exp2(p):
     '''
@@ -469,10 +504,12 @@ def p_m_exp2(p):
            | empty
     '''
 
+
 def p_t(p):
     '''
     t : f t2
     '''
+
 
 def p_t2(p):
     '''
@@ -481,17 +518,20 @@ def p_t2(p):
        | empty
     '''
 
+
 def p_f(p):
     '''
     f : addFBottom expression popFBottom
       | addOperand
     '''
 
+
 def p_endOfExp(p):
     '''
     endOfExp : SEMICOLON
     '''
     endOfExpresion()
+
 
 def p_addOperand(p):
     '''
@@ -507,6 +547,7 @@ def p_addOperand(p):
             print("Error: La variable no ha sido declarada antes de su uso")
             exit()
 
+
 def p_opadd(p):
     '''
     opadd :
@@ -515,8 +556,9 @@ def p_opadd(p):
         if validateOperator(p[-1], operatorStack.top()):
             createQuadruple()
         elif operatorStack.size() == 0:
-            createQuadruple()    
+            createQuadruple()
     operatorStack.add(p[-1])
+
 
 def p_addFBottom(p):
     '''
@@ -524,11 +566,13 @@ def p_addFBottom(p):
     '''
     operatorStack.addFakeBottom()
 
+
 def p_popFBottom(p):
     '''
     popFBottom : CPARENTHESIS
     '''
     operatorStack.popFakeBottom()
+
 
 def p_params(p):
     '''
@@ -538,17 +582,20 @@ def p_params(p):
            | empty
     '''
 
+
 def p_params2(p):
     '''
     params2 : COMMA params
             | empty
     '''
 
+
 def p_funparams(p):
     '''
     funparams : addType ID  funparams2
               | empty
     '''
+
 
 def p_addType(p):
     '''
@@ -560,16 +607,19 @@ def p_addType(p):
         if i[0] == currFun:
             i[1].append(p[1])
 
+
 def p_funparams2(p):
     '''
     funparams2 : COMMA funparams
             | empty
     '''
 
+
 def p_whileloop(p):
     '''
     whileloop : WHILE whilepoint g_exp CPARENTHESIS gotoF OCURLY block CCURLY whileend
     '''
+
 
 def p_varvalue(p):
     '''
@@ -592,10 +642,12 @@ def p_varvalue(p):
             print("Error: el tipo de variable no coincide con el valor asignado ")
             exit()
 
+
 def p_class(p):
     '''
     class : CLASS ID OCURLY class2 class3 CCURLY
     '''
+
 
 def p_class2(p):
     '''
@@ -603,52 +655,62 @@ def p_class2(p):
             | empty
     '''
 
+
 def p_class3(p):
     '''
     class3 : method class3
            | empty
     '''
 
+
 def p_obj_constructor(p):
     '''
     obj_constructor : CLASSID ID OPARENTHESIS params CPARENTHESIS OCURLY block CCURLY
     '''
+
 
 def p_obj_declaration(p):
     '''
     obj_declaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
     '''
 
+
 def p_obj_method_access(p):
     '''
     obj_method_access : OBJID DOT method endOfExp
     '''
+
 
 def p_obj_attr_access(p):
     '''
     obj_attr_access : OBJID DOT attribute endOfExp
     '''
 
+
 def p_method(p):
     '''
     method : fun
     '''
+
 
 def p_attribute(p):
     '''
     attribute : var
     '''
 
+
 def p_return(p):
     '''
     return : RETURN ID endOfExp
     '''
+
 
 def p_empty(p):
     '''
     empty : 
     '''
     pass
+
 
 def p_end(p):
     '''
@@ -660,6 +722,7 @@ def p_end(p):
 ##################################
 #             MODULES            #
 ##################################
+
 
 def p_era(p):
     '''
@@ -673,6 +736,7 @@ def p_era(p):
     tempQuad.setResult(p[-1])
     quadrupleList.append(tempQuad)
     id += 1
+
 
 def p_gosub(p):
     '''
@@ -692,6 +756,7 @@ def p_gosub(p):
     scopeList.append("local")
     quadrupleList.append(tempQuad)
     id += 1
+
 
 def p_addparam(p):
     '''
@@ -713,6 +778,7 @@ def p_addparam(p):
     quadrupleList.append(tempQuad)
     id += 1
 
+
 def p_endfun(p):
     '''
     endfun : 
@@ -725,11 +791,14 @@ def p_endfun(p):
 ##################################
 #              WHILE             #
 ##################################
+
+
 def p_whilepoint(p):
     '''
     whilepoint : OPARENTHESIS
     '''
     jumpsStack.add(id)
+
 
 def p_whileend(p):
     '''
@@ -748,6 +817,7 @@ def p_whileend(p):
 #              FOR               #
 ##################################
 
+
 def p_for_id(p):
     '''
     for_id : ID
@@ -759,6 +829,7 @@ def p_for_id(p):
     else:
         print("Error: No se ha declarado la variable contadora")
         exit()
+
 
 def p_for_endexpid(p):
     '''
@@ -776,6 +847,7 @@ def p_for_endexpid(p):
     tempQuad = quadruples.Quadruple(id, '=', exp, '', vcontrol)
     quadrupleList.append(tempQuad)
     id += 1
+
 
 def p_for_endexpcond(p):
     '''
@@ -798,6 +870,7 @@ def p_for_endexpcond(p):
     jumpsStack.add(id-1)
     gotoFQuadruple()
 
+
 def p_for_end(p):
     '''
     for_end : 
@@ -812,9 +885,6 @@ def p_for_end(p):
     tempQuad = quadruples.Quadruple(id, '=', ty, '', vcontrol)
     quadrupleList.append(tempQuad)
     id += 1
-    #tempQuad = quadruples.Quadruple(id,'=',ty,'',operandStack.top())
-    # quadrupleList.append(tempQuad)
-    #id += 1
     fin = jumpsStack.pop()
     ret = jumpsStack.pop()
     tempQuad = quadruples.Quadruple(id, 'goto', '', '', ret)
@@ -822,9 +892,10 @@ def p_for_end(p):
     id += 1
     fill(fin, id)
     operandStack.pop()
-    #typDelete = typestack.pop()
 
 # Error handler for illegal syntaxis
+
+
 def p_error(p):
     print("Syntax error at " + str(p.value))
     global dError
@@ -834,11 +905,13 @@ def p_error(p):
 #   CREATE QUADRUPLE FUNCTIONS   #
 ##################################
 
+
 def createQuadruple():
     if operatorStack.top() == '=':
         assignQuadruple()
     else:
         operationQuadruple()
+
 
 def createTemp():
     global idTemp
@@ -849,6 +922,7 @@ def createTemp():
     programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
 
+
 def createTempFun(newType):
     global idTemp
     idTemp += 1
@@ -857,6 +931,7 @@ def createTempFun(newType):
     vardir = Memory.assignDir(currScope, "int")
     programDirectory.getVarTable().addVar(myTemp, newType, 0, currScope, vardir)
     return myTemp
+
 
 def createParamTemp():
     global param
@@ -867,6 +942,7 @@ def createParamTemp():
     vardir = Memory.assignDir(currScope, "int")
     programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
+
 
 def assignQuadruple():
     global id
@@ -879,6 +955,7 @@ def assignQuadruple():
     operandStack.pop()
     quadrupleList.append(tempQuad)
     id += 1
+
 
 def operationQuadruple():
     global id
@@ -901,6 +978,7 @@ def operationQuadruple():
         print("error en el tipo de operador")
         exit()
 
+
 def printQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id, 'print', '', '', '')
@@ -908,6 +986,7 @@ def printQuadruple():
     operandStack.pop()
     quadrupleList.append(tempQuad)
     id += 1
+
 
 def gotoFQuadruple():
     # Aqui va la validacion de tipo, si es bool genera cuadruplo
@@ -919,12 +998,14 @@ def gotoFQuadruple():
     jumpsStack.add(id)
     id += 1
 
+
 def endOfExpresion():
     while operandStack.size() >= 1 and operatorStack.size() > 0:
         if operatorStack.top() == '=':
             assignQuadruple()
         else:
             operationQuadruple()
+
 
 def fill(top, id):
     for item in quadrupleList:
@@ -934,11 +1015,14 @@ def fill(top, id):
 ##################################
 #       GOTO, GOTOF, GOTOT       #
 ##################################
+
+
 def p_gotoF(p):
     '''
     gotoF :
     '''
     gotoFQuadruple()
+
 
 def p_goto(p):
     '''
@@ -951,6 +1035,7 @@ def p_goto(p):
     jumpsStack.add(id)
     id += 1
     fill(false, id)
+
 
 # Build the parser
 parser = yacc()
@@ -965,8 +1050,9 @@ print("Ejemplo funciones")
 case_TestCorrect2 = parser.parse(f2.read())
 
 if (dError == True):
-   # for quad in quadrupleList:
-    #    print(quad.getId(), quad.getOperator(), quad.getOperandRight(), quad.getOperandLeft(),quad.getResult())
+    for quad in quadrupleList:
+        print(quad.getId(), quad.getOperator(), quad.getOperandRight(),
+              quad.getOperandLeft(), quad.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
