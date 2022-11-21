@@ -1,5 +1,6 @@
 # Memory limits
 
+# Agregar objetos
 # GLOBAL INT --> 1000 - 2999
 # GLOBAL FLOAT --> 3000 - 4999
 # GLOBAL BOOL --> 5000 - 6999
@@ -7,7 +8,6 @@
 # LOCAL INT --> 7000 - 9999
 # LOCAL FLOAT --> 10000 11999
 # LOCAL BOOL --> 12000 13999
-
 # CONSTANTS -->  14000 - 15999
 
 MAX_PER_VAR = 2000

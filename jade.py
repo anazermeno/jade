@@ -126,6 +126,12 @@ def t_ID(t):
 
 def t_CLASSID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value,'CLASSID') 
+    return t
+
+def t_OBJID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value,'OBJID') 
     t.type = reserved.get(t.value, 'ID')
     return t
 
@@ -254,6 +260,9 @@ def p_statement(p):
               | whileloop
               | funcall
               | class
+              | objdeclaration
+              | objmethodaccess
+              | objattraccess
     '''
 
 
@@ -316,8 +325,10 @@ def p_assign(p):
 def p_assign2(p):
     '''
     assign2 : ID EQUAL opadd assign3 
+            | objattraccess EQUAL opadd addOperand
     '''
-    if programDirectory.getVarTable().idExist(p[1]):
+    if p[1] != None:
+      if programDirectory.getVarTable().idExist(p[1]):
         operandStack.add(p[1])
         typeStack.add(
             programDirectory.getVarTable().getItem(p[1]).returnType())
@@ -645,14 +656,14 @@ def p_varvalue(p):
 
 def p_class(p):
     '''
-    class : CLASS ID OCURLY class2 class3 CCURLY
+    class : CLASS ID OCURLY class2 objconstructor class3 addclass CCURLY
     '''
 
 
 def p_class2(p):
     '''
     class2 : attribute class2
-            | empty
+           | empty
     '''
 
 
@@ -662,40 +673,39 @@ def p_class3(p):
            | empty
     '''
 
-
-def p_obj_constructor(p):
+def p_addclass( p ):
     '''
-    obj_constructor : CLASSID ID OPARENTHESIS params CPARENTHESIS OCURLY block CCURLY
-    '''
+    addclass : empty
+    '''    
+    # Agregar a directorio
 
-
-def p_obj_declaration(p):
+def p_objconstructor( p ):
     '''
-    obj_declaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
-    '''
-
-
-def p_obj_method_access(p):
-    '''
-    obj_method_access : OBJID DOT method endOfExp
+    objconstructor : CLASSID ID OPARENTHESIS params CPARENTHESIS block
     '''
 
 
-def p_obj_attr_access(p):
+def p_objdeclaration( p ):
     '''
-    obj_attr_access : OBJID DOT attribute endOfExp
-    '''
-
-
-def p_method(p):
-    '''
-    method : fun
+    objdeclaration : CLASSID OBJID OPARENTHESIS params CPARENTHESIS endOfExp
     '''
 
-
-def p_attribute(p):
+def p_objmethodaccess( p ):
     '''
-    attribute : var
+    objmethodaccess : ID DOT method
+    '''
+    # hacer similar al acceso de atributos
+
+def p_objattraccess( p ):
+    '''
+    objattraccess : ID DOT ID
+    '''
+    operandStack.add(p[1] + '.' + p[3])
+
+
+def p_method( p ):
+    '''
+    method : funcall
     '''
 
 
@@ -1035,7 +1045,6 @@ def p_goto(p):
     jumpsStack.add(id)
     id += 1
     fill(false, id)
-
 
 # Build the parser
 parser = yacc()
