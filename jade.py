@@ -318,6 +318,16 @@ def p_assign3(p):
             | expression
     '''
 
+def p_assignArray( p ):
+    '''
+    assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL expression
+    '''
+
+def p_assignMatrix( p ):
+    '''
+    assignArray : ASSIGN MATRIX ID OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET EQUAL expression
+    '''
+    
 def p_condition(p):
     '''
     condition : IF condition2 end
