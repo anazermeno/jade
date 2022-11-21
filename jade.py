@@ -37,6 +37,8 @@ reserved = {
     'program': 'PROGRAM',
     'class': 'CLASS',
     'var': 'VAR',
+    'array' : 'ARRAY',
+    'matrix' : 'MATRIX',
     'assign': 'ASSIGN',
     'fun': 'FUN',
     'return': 'RETURN',
@@ -217,6 +219,8 @@ def p_mainScope(p):
 def p_block(p):
     '''
     block : var block
+          | varArray
+          | varMatrix
           | fun block
           | statement block
           | empty
@@ -259,6 +263,13 @@ def p_var(p):
 #         | setVar2
 #    '''
 
+def p_varArray( p ):
+    '''
+    varArray : VAR ARRAY INT ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
+            | VAR ARRAY FLOAT ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
+            | VAR ARRAY BOOL ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
+    '''
+
 def p_varArray(p):
     '''
     varArray : CTEINT
@@ -267,6 +278,12 @@ def p_varArray(p):
     programDirectory.getVarTable().addVar(programDirectory.returnId(),
                                           programDirectory.returnType(), size, 0)
 
+def p_varMatrix( p ):
+    '''
+    varMatrix : VAR MATRIX INT ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
+              | VAR MATRIX DOUBLE ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
+              | VAR MATRIX BOOL ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
+    '''
 def p_type(p):
     '''
     type : INT

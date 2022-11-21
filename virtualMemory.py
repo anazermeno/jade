@@ -11,6 +11,7 @@
 # CONSTANTS -->  14000 - 15999
 
 MAX_PER_VAR = 2000
+
 GLOBAL_INT = 1000
 cGLOBAL_INT = 0
 GLOBAL_FLOAT = 3000
@@ -25,7 +26,7 @@ cLOCAL_FLOAT = 0
 LOCAL_BOOL = 10000
 cLOCAL_BOOL = 0
 
-CONSTANTDIR = 9000
+CONSTANTDIR = 12000
 cCONSTANTS = 0
 
 
@@ -36,6 +37,7 @@ class Memory:
         global cGLOBAL_INT, cGLOBAL_FLOAT, cGLOBAL_BOOL
         global LOCAL_INT, LOCAL_FLOAT, LOCAL_BOOL
         global cLOCAL_INT, cLOCAL_FLOAT, cLOCAL_BOOL
+        global CONSTANTDIR
 
         if scope == "program":
             if type == "int" and GLOBAL_INT < 2999:
@@ -59,12 +61,12 @@ class Memory:
                 LOCAL_FLOAT += 1
                 cLOCAL_FLOAT += 1
                 return LOCAL_FLOAT
-            elif type == "bool" and LOCAL_BOOL < 12999:
+            elif type == "bool" and LOCAL_BOOL < 11999:
                 LOCAL_BOOL += 1
                 cLOCAL_BOOL += 1
                 return LOCAL_BOOL
         elif scope == "constant":
-            if type == "constannt" and CONSTANTDIR < 9000:
+            if type == "constannt" and CONSTANTDIR < 13999:
                 CONSTANTDIR += 1
                 cCONSTANTS += 1
                 return CONSTANTDIR
