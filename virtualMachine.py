@@ -75,9 +75,19 @@ class virtualMachine:
             self.assignedVars.update(obj)
 
     def jadeGoSub(self):        
-        while self.quadruples[self.tempbreadcrumb+1].getOperator() != 'ENDFUN' and self.tempbreadcrumb < len(self.quadruples):
+        while self.quadruples[self.tempbreadcrumb].getOperator() != 'ENDFUN' and self.tempbreadcrumb < len(self.quadruples):
             self.ExecuteQuadruple(self.quadruples[self.tempbreadcrumb])
             self.tempbreadcrumb += 1
+
+    def jadeGoto(self):        
+        while self.tempbreadcrumb < len(self.quadruples):
+            self.ExecuteQuadruple(self.quadruples[self.tempbreadcrumb])
+            self.tempbreadcrumb += 1
+
+    def jadeEra(self):        
+        while self.tempbreadcrumb < len(self.quadruples):
+            self.ExecuteQuadruple(self.quadruples[self.tempbreadcrumb])
+            self.tempbreadcrumb += 1        
 
     def jadeWrite(self, var):
         if var[0:4] == "temp" or var.isdigit() == False:
@@ -105,16 +115,16 @@ class virtualMachine:
             dir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
             obj = {dir: quadruple.getResult()}
             self.assignedVars.update(obj)
-        elif quadruple.getOperator() == 'ERA':
-            print("era ", quadruple.getResult())
         elif quadruple.getOperator() == 'PARAM':
             print("parámetro", quadruple.getOperandLeft(),quadruple.getResult())
-        elif quadruple.getOperator() == 'GOSUB':
-            self.tempbreadcrumb = quadruple.getResult()
-            self.jadeGoSub()
         elif quadruple.getOperator() == 'print':
             self.jadeWrite(quadruple.getResult())
 
     def virtualMachineStart(self):
         for quadruple in self.quadruples:
-            self.ExecuteQuadruple(quadruple)
+            if quadruple.getOperator() == 'goto':
+                self.tempbreadcrumb = quadruple.getResult()
+                self.jadeGoto()
+            elif quadruple.getOperator() == 'GOSUB':
+                self.tempbreadcrumb = quadruple.getResult()
+                self.jadeGoSub()    

@@ -207,7 +207,6 @@ def p_main(p):
     '''
     main : MAIN mainScope OCURLY block2 CCURLY 
     '''
-    quadrupleList[0].setResult(id)
     
 def p_mainScope(p):
     '''
@@ -215,6 +214,7 @@ def p_mainScope(p):
     '''
     scopeList.append("local")
     programDirectory.setType("main")
+    quadrupleList[0].setResult(id)
 
 def p_block(p):
     '''
@@ -285,7 +285,7 @@ def p_varArray2(p):
 def p_varMatrix( p ):
     '''
     varMatrix : VAR MATRIX INT ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
-              | VAR MATRIX DOUBLE ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
+              | VAR MATRIX FLOAT ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
               | VAR MATRIX BOOL ID EQUAL OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET SEMICOLON
     '''
 def p_type(p):
@@ -329,7 +329,7 @@ def p_assignArray( p ):
 
 def p_assignMatrix( p ):
     '''
-    assignArray : ASSIGN MATRIX ID OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET EQUAL expression
+    assignMatrix : ASSIGN MATRIX ID OBRACKET CTEINT CBRACKET OBRACKET CTEINT CBRACKET EQUAL expression
     '''
     
 def p_condition(p):
@@ -956,15 +956,17 @@ def p_goto(p):
 parser = yacc()
 dError = True
 
-f = open("ejemplo_aritmetico.ja", "r")
-print("Ejemplo arimético")
-case_TestCorrect = parser.parse(f.read())
+#f = open("ejemplo_aritmetico.ja", "r")
+#print("Ejemplo arimético")
+#case_TestCorrect = parser.parse(f.read())
 
-#f2 = open("ejemplo_funciones.ja", "r")
-#print("Ejemplo funciones")
-#case_TestCorrect2 = parser.parse(f2.read())
+f2 = open("ejemplo_funciones.ja", "r")
+print("Ejemplo funciones")
+case_TestCorrect2 = parser.parse(f2.read())
 
 if (dError == True):
+   # for quad in quadrupleList:
+    #    print(quad.getId(), quad.getOperator(), quad.getOperandRight(), quad.getOperandLeft(),quad.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
