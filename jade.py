@@ -269,14 +269,14 @@ def p_var(p):
 
 def p_varArray( p ):
     '''
-    varArray : VAR ARRAY INT ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
-            | VAR ARRAY FLOAT ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
-            | VAR ARRAY BOOL ID EQUAL OBRACKET varArray CBRACKET SEMICOLON
+    varArray : VAR ARRAY INT ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
+            | VAR ARRAY FLOAT ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
+            | VAR ARRAY BOOL ID EQUAL OBRACKET varArray2 CBRACKET SEMICOLON
     '''
 
-def p_varArray(p):
+def p_varArray2(p):
     '''
-    varArray : CTEINT
+    varArray2 : CTEINT
     '''
     size = p[1]
     programDirectory.getVarTable().addVar(programDirectory.returnId(),
