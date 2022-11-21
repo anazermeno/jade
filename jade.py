@@ -219,8 +219,8 @@ def p_mainScope(p):
 def p_block(p):
     '''
     block : var block
-          | varArray
-          | varMatrix
+          | varArray block
+          | varMatrix block
           | fun block
           | statement block
           | empty
@@ -230,12 +230,16 @@ def p_block2(p):
     '''
     block2 : statement block2
            | var block2
+           | varArray block2
+           | varMatrix block2
            | empty
     '''
 
 def p_statement(p):
     '''
     statement : assign
+              | assignArray
+              | assignMatrix
               | write
               | read
               | condition
