@@ -13,11 +13,15 @@ class virtualMachine:
     def jadeSum(self, left, right, opresult):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        if right[0:4] == "temp":
-            rightDir = self.directory.getItem(right).returnDir()
+        result = 0
+        try:
+            if right[0:4] == "temp":
+                rightDir = self.directory.getItem(right).returnDir()
+        except:
+            rightDir = right
+            result += right        
         if left[0:4] == "temp":
             leftDir = self.directory.getItem(left).returnDir()
-        result = 0
         for i in self.assignedVars:
             if i == leftDir or i == rightDir:
                 result += self.assignedVars.get(i)
@@ -101,6 +105,7 @@ class virtualMachine:
                 print("Error: la variable que se intentó imprimir aún no tiene un valor")
 
     def ExecuteQuadruple(self, quadruple):
+        #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
         if quadruple.getOperator() == '+':
             return self.jadeSum(quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
         elif quadruple.getOperator() == '-':
@@ -123,6 +128,14 @@ class virtualMachine:
             self.jadeWrite(quadruple.getResult())
 
     def virtualMachineStart(self):
+        # look for assignment of global variables
+        for i in range(0, self.quadruples[0].getResult()):
+            if self.quadruples[i].getOperator() == '=':
+                dir = self.directory.getItem(
+                    self.quadruples[i].getOperandLeft()).returnDir()
+                obj = {dir: self.quadruples[i].getResult()}
+                self.assignedVars.update(obj)
+
         for quadruple in self.quadruples:
             if quadruple.getOperator() == 'goto':
                 self.tempbreadcrumb = quadruple.getResult()
@@ -130,3 +143,4 @@ class virtualMachine:
             elif quadruple.getOperator() == 'GOSUB':
                 self.tempbreadcrumb = quadruple.getResult()
                 self.jadeGoSub()
+

@@ -5,8 +5,8 @@
 # GLOBAL FLOAT --> 3000 - 4999
 # GLOBAL BOOL --> 5000 - 6999
 
-# LOCAL INT --> 7000 - 9999
-# LOCAL FLOAT --> 10000 11999
+# LOCAL INT --> 7000 - 8999
+# LOCAL FLOAT --> 9000 11999
 # LOCAL BOOL --> 12000 13999
 # CONSTANTS -->  14000 - 15999
 
@@ -32,43 +32,44 @@ cCONSTANTS = 0
 
 class Memory:
 
-    def assignDir(scope: str, type: str):
+    def assignDir(scope: str, type: str, size: int):
         global GLOBAL_INT, GLOBAL_FLOAT, GLOBAL_BOOL
         global cGLOBAL_INT, cGLOBAL_FLOAT, cGLOBAL_BOOL
         global LOCAL_INT, LOCAL_FLOAT, LOCAL_BOOL
         global cLOCAL_INT, cLOCAL_FLOAT, cLOCAL_BOOL
         global CONSTANTDIR
+        global cCONSTANTS
 
         if scope == "program":
             if type == "int" and GLOBAL_INT < 2999:
-                GLOBAL_INT += 1
-                cGLOBAL_INT += 1
+                GLOBAL_INT += size
+                cGLOBAL_INT += size
                 return GLOBAL_INT
             elif type == "float" and GLOBAL_FLOAT < 4999:
-                GLOBAL_FLOAT += 1
-                cGLOBAL_FLOAT += 1
+                GLOBAL_FLOAT += size
+                cGLOBAL_FLOAT += size
                 return GLOBAL_FLOAT
             elif type == "bool" and GLOBAL_BOOL < 6999:
-                GLOBAL_BOOL += 1
-                cGLOBAL_BOOL += 1
+                GLOBAL_BOOL += size
+                cGLOBAL_BOOL += size
                 return GLOBAL_BOOL
         elif scope == "local":
             if type == "int" and LOCAL_INT < 8999:
-                LOCAL_INT += 1
-                cLOCAL_INT += 1
+                LOCAL_INT += size
+                cLOCAL_INT += size
                 return LOCAL_INT
             elif type == "float" and LOCAL_FLOAT < 10999:
-                LOCAL_FLOAT += 1
-                cLOCAL_FLOAT += 1
+                LOCAL_FLOAT += size
+                cLOCAL_FLOAT += size
                 return LOCAL_FLOAT
             elif type == "bool" and LOCAL_BOOL < 11999:
-                LOCAL_BOOL += 1
-                cLOCAL_BOOL += 1
+                LOCAL_BOOL += size
+                cLOCAL_BOOL += size
                 return LOCAL_BOOL
         elif scope == "constant":
-            if type == "constannt" and CONSTANTDIR < 13999:
-                CONSTANTDIR += 1
-                cCONSTANTS += 1
+            if type == "constant" and CONSTANTDIR < 13999:
+                CONSTANTDIR += size
+                cCONSTANTS += size
                 return CONSTANTDIR
         else:
             return 0

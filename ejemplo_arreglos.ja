@@ -1,0 +1,7 @@
+program test5{
+    main{
+        var array int unid = [10];
+        assign array unid [0] = 20;
+        var matrix int primerMat = [12][3];
+    }
+}

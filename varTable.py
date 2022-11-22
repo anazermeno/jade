@@ -55,6 +55,10 @@ class varReg:
     def returnScope(self):
         return self.scope
 
+    # Function to retrieve size
+    def returnSize(self):
+        return self.size    
+
     # Function to get type
     def setType(self, type):
         self.type = type
