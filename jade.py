@@ -344,10 +344,15 @@ def p_assign2(p):
 def p_assign3(p):
     '''
     assign3 : addOperand
-            | expression
+            | expression addexp
     '''
 
-
+def p_addexp(p):
+    '''
+    addexp :
+    '''
+    endOfExpresion()
+    
 def p_assignArray(p):
     '''
     assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL expression SEMICOLON
@@ -549,7 +554,6 @@ def p_m_exp2(p):
            | empty
     '''
 
-
 def p_t(p):
     '''
     t : f t2
@@ -679,6 +683,15 @@ def p_varvalue(p):
         constdir = Memory.assignDir("constant", "constant", 1)
         programDirectory.getVarTable().addVar(
             p[1], "int", 0, "constant", constdir)
+    else:
+        constdir = Memory.assignDir("constant", "constant", 1)
+        if str(type(p[1]))[8:11] == "int":
+            programDirectory.getVarTable().addVar(
+            p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
+        elif str(type(p[1])[8:13]) == "float":
+            programDirectory.getVarTable().addVar(
+            p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
+        operandStack.add(p[1])       
 
 
 def p_class(p):
