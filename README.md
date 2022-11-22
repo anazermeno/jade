@@ -1,5 +1,21 @@
 # JADE
 
+### Por: Ana Zermeño y Ana Carolina Arellano
+#### Avance 7
+#### 21/11/2022
+
+-----
+
+Máquina virtual ya ejecuta operaciones aritméticas y cambio de contexto con los módulos
+*TODO: Terminar uso de arreglos y objetos
+
+##### Para correr el programa: 
+ - Ir a la terminar en la ubicación del folder JADE
+ - Enterminar abrir el directorio JADE
+ - Correr: ``` python3 jade.py ```
+
+
+### Por: Ana Zermeño y Ana Carolina Arellano
 #### Avance 5
 #### 07/11/2022
 
@@ -11,9 +27,10 @@ Generación de cuádruplos lineales funcionando. Cuádruplos de if con else tamb
 ##### Para correr el programa: 
  - Ir a la terminar en la ubicación del folder JADE
  - Enterminar abrir el directorio JADE
- - Correr: ``` python main.py ```
+ - Correr: ``` python3 jade.py```
 
 
+### Por: Ana Zermeño y Ana Carolina Arellano
 #### Avance 3
 #### 03/10/2022
 
