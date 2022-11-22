@@ -338,7 +338,7 @@ def p_assign2(p):
                 programDirectory.getVarTable().getItem(p[1]).returnType())
     else:
         print("Error: La variable no ha sido declarada antes de su uso")
-        exit
+        exit()
 
 
 def p_assign3(p):
@@ -627,7 +627,6 @@ def p_params(p):
            | empty
     '''
 
-
 def p_params2(p):
     '''
     params2 : COMMA params
@@ -637,27 +636,16 @@ def p_params2(p):
 
 def p_funparams(p):
     '''
-    funparams : addType ID  funparams2
+    funparams : INT ID  
+              | FLOAT ID  
+              | BOOL ID
               | empty
     '''
-
-
-def p_addType(p):
-    '''
-    addType : INT
-           | FLOAT
-           | BOOL
-    '''
+    constdir = Memory.assignDir("local", p[1], 1)
+    programDirectory.getVarTable().addVar(p[2], p[1], 0, "constant", constdir)
     for i in eraData:
         if i[0] == currFun:
-            i[1].append(p[1])
-
-
-def p_funparams2(p):
-    '''
-    funparams2 : COMMA funparams
-            | empty
-    '''
+            i[1].append(p[2])
 
 
 def p_whileloop(p):
@@ -811,6 +799,16 @@ def p_addparam(p):
     '''
     global id
     tempQuad = quadruples.Quadruple(id, 'PARAM', '', '', '')
+    if str(type(p[-1]))[8:11] == "int":
+        operandStack.add(p[-1])
+        typeStack.add("int")
+        constdir = Memory.assignDir("constant", "constant", 1)
+        programDirectory.getVarTable().addVar(p[-1], "int", 1, "constant", constdir)
+    elif  str(type(p[-1]))[8:13] == "float":
+        operandStack.add(p[-1])
+        typeStack.add("float")
+        constdir = Memory.assignDir("constant", "constant", 1)
+        programDirectory.getVarTable().addVar(p[-1], "float", 1, "constant", constdir) 
     if programDirectory.getVarTable().idExist(p[-1]):
         operandStack.add(p[-1])
         typeStack.add(
@@ -1105,8 +1103,8 @@ dError = True
 #case_TestCorrect2 = parser.parse(f3.read())
 
 f4 = open("ejemplo_ciclos.ja", "r")
-case_TestCorrect2 = parser.parse(f4.read())
 print("Ejemplo ciclos")
+case_TestCorrect2 = parser.parse(f4.read())
 
 #f5 = open("ejemplo_arreglos.ja", "r")
 #print("Ejemplo arrays")

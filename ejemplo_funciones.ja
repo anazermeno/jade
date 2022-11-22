@@ -1,16 +1,17 @@
 program test2 {
     var int num3;
 
-    fun void imprimeuno(){
+    fun void imprimeuno(int a){
         assign num3 = 3490;
         print(num3);
+        print(a);
     }
 
     main {
         var int ejemplo;
         assign ejemplo = 20;
         print(ejemplo);
-        imprimeuno();
+        imprimeuno(5);
     }
 
 }

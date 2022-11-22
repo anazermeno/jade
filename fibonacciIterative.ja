@@ -9,7 +9,7 @@ program fibonacci {
         
         while(i<=num){
             assign sequence[i] = sequence[i-2] + sequence[i-1];
-            i = i + 1;
+            assign i = i + 1;
         }
         
         assign res = sequence[num]

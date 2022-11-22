@@ -103,11 +103,7 @@ class virtualMachine:
                 self.ExecuteQuadruple(self.quadruples[pointer])
             pointer += 1    
         pointer = self.pointerGlobal        
-
-    def jadeEra(self):
-        while self.tempbreadcrumb < len(self.quadruples):
-            self.ExecuteQuadruple(self.quadruples[self.tempbreadcrumb])
-            self.tempbreadcrumb += 1
+       
 
     def jadeLogicOp(self, quadruple):
         leftDir = self.directory.getItem(
@@ -179,8 +175,15 @@ class virtualMachine:
                 quadruple.getOperandLeft()).returnDir()
             obj = {dir: quadruple.getResult()}
             self.assignedVars.update(obj)
+        elif quadruple.getOperator() == 'ERA':
+            global currFun
+            currFun = quadruple.getResult()
         elif quadruple.getOperator() == 'PARAM':
-            print("parámetro", quadruple.getOperandLeft(), quadruple.getResult())
+            for i in self.eraData:
+                if i[0] == currFun:
+                    obj = {self.directory.getItem(
+                    i[1][0]).returnDir(): quadruple.getOperandLeft()}
+                    self.assignedVars.update(obj)
         elif quadruple.getOperator() == '>' or quadruple.getOperator() == '<' or quadruple.getOperator() == '<=' or quadruple.getOperator() == ">=" or quadruple.getOperator() == "!=" or quadruple.getOperator() == "==":
             self.jadeLogicOp(quadruple)
         elif quadruple.getOperator() == 'goto':
