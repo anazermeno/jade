@@ -101,7 +101,8 @@ class virtualMachine:
         while pointer <= self.pointerGlobal:
             if pointer < len(self.quadruples):
                 self.ExecuteQuadruple(self.quadruples[pointer])
-                pointer += 1
+            pointer += 1    
+        pointer = self.pointerGlobal        
 
     def jadeEra(self):
         while self.tempbreadcrumb < len(self.quadruples):
