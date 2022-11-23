@@ -355,18 +355,31 @@ def p_addexp(p):
     
 def p_assignArray(p):
     '''
-    assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL expression SEMICOLON
+    assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL CTEINT SEMICOLON
+                | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL CTEFLOAT SEMICOLON
+                | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL BOOL SEMICOLON
+                | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL ID SEMICOLON
     '''
-    # check bounds
+    # check bounds quadruple
     if p[5] < programDirectory.getVarTable().getItem(p[3]).returnSize() and p[5] >= 0:
         global id
         tempQuad = quadruples.Quadruple(
-            id, 'VER', p[5], programDirectory.getVarTable().getItem(p[3]).returnSize(), p[8])
+            id, 'VER', p[5], programDirectory.getVarTable().getItem(p[3]).returnSize(), p[3])
         quadrupleList.append(tempQuad)
         id += 1
     else:
         print("Error: índice fuera de los límites")
-
+        exit()
+    #Go to memory dir
+    calc = programDirectory.getVarTable().getItem(p[3]).returnSize() - p[5]
+    currScope = scopeList[len(scopeList)-1]
+    currtype = programDirectory.getVarTable().getItem(p[3]).returnType()
+    dir = programDirectory.getVarTable().getItem(p[3]).returnDir() - calc
+    programDirectory.getVarTable().addVar(p[3]+str(p[5]), currtype, 1, currScope, dir)
+    #Assign quadruple
+    tempQuad = quadruples.Quadruple(id, p[7], p[3]+str(p[5]), '', p[8])
+    quadrupleList.append(tempQuad)
+    id += 1
 
 def p_assignMatrix(p):
     '''
@@ -413,8 +426,14 @@ def p_write(p):
 def p_write2(p):
     '''
     write2 : expression printparam write3
-           | CTESTRING printstring write3
+           | ID OBRACKET CTEINT CBRACKET 
     '''
+    if(p[1] != None): #print array cell
+        global id
+        tempQuad = quadruples.Quadruple(id, 'print', '', '', '')
+        tempQuad.setResult(p[1]+str(p[3]))
+        quadrupleList.append(tempQuad)
+        id += 1
 
 
 def p_write3(p):
@@ -683,15 +702,16 @@ def p_varvalue(p):
         constdir = Memory.assignDir("constant", "constant", 1)
         programDirectory.getVarTable().addVar(
             p[1], "int", 0, "constant", constdir)
-    else:
-        constdir = Memory.assignDir("constant", "constant", 1)
-        if str(type(p[1]))[8:11] == "int":
-            programDirectory.getVarTable().addVar(
-            p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
-        elif str(type(p[1])[8:13]) == "float":
-            programDirectory.getVarTable().addVar(
-            p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
-        operandStack.add(p[1])       
+    #else:
+    #    constdir = Memory.assignDir("constant", "constant", 1)
+    #    if str(type(p[1]))[8:11] == "int":
+    #        programDirectory.getVarTable().addVar(
+    #        p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
+    #    elif str(type(p[1])[8:13]) == "float":
+    #        programDirectory.getVarTable().addVar(
+    #        p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
+    #    operandStack.add(p[1])
+    #    print(operandStack.items)       
 
 
 def p_class(p):
@@ -1115,13 +1135,13 @@ dError = True
 #print("Ejemplo objetos")
 #case_TestCorrect2 = parser.parse(f3.read())
 
-f4 = open("ejemplo_ciclos.ja", "r")
-print("Ejemplo ciclos")
-case_TestCorrect2 = parser.parse(f4.read())
+#f4 = open("ejemplo_ciclos.ja", "r")
+#print("Ejemplo ciclos")
+#case_TestCorrect2 = parser.parse(f4.read())
 
-#f5 = open("ejemplo_arreglos.ja", "r")
-#print("Ejemplo arrays")
-#case_TestCorrect2 = parser.parse(f5.read())
+f5 = open("ejemplo_arreglos.ja", "r")
+print("Ejemplo arrays")
+case_TestCorrect2 = parser.parse(f5.read())
 
 #f6 = open("ejemplo_boleanos.ja", "r")
 #case_TestCorrect2 = parser.parse(f6.read())

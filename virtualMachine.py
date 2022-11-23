@@ -157,6 +157,7 @@ class virtualMachine:
 
     def ExecuteQuadruple(self, quadruple):
         self.pointerGlobal += 1 
+        #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
         if quadruple.getOperator() == '+':
             return self.jadeSum(quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
         elif quadruple.getOperator() == '-':

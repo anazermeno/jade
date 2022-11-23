@@ -3,5 +3,11 @@ program test5{
         var array int unid = [10];
         assign array unid [0] = 20;
         var matrix int primerMat = [12][3];
+        var int num;
+        assign num = 1;
+        assign array unid[1] = 10; 
+        assign array unid[2] = num;
+
+        print(unid[1]);
     }
 }
