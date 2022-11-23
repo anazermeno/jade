@@ -346,7 +346,17 @@ def p_assign3(p):
     '''
     assign3 : expression
             | addOperand
+            | ID OBRACKET ID CBRACKET
+            | ID OBRACKET CTEINT CBRACKET
     '''
+    if p[1] != None: # arreglo0
+        if programDirectory.getVarTable().idExist(p[1]):
+            operandStack.add(p[1]+ " " + programDirectory.getVarTable().getItem(p[3]).returnId())
+            typeStack.add(
+                programDirectory.getVarTable().getItem(p[1]).returnType())
+        else:
+            print("Error: La variable no ha sido declarada antes de su uso")
+            exit()
     
 def p_assignArray(p):
     '''
@@ -1127,12 +1137,12 @@ def p_goto(p):
 parser = yacc()
 dError = True
 
-#print("Ejemplo arimético")
 #f = open("ejemplo_aritmetico.ja", "r")
+#print("Ejemplo arimético")
 #case_TestCorrect = parser.parse(f.read())
 
-#f2 = open("ejemplo_funciones.ja", "r")
 #print("Ejemplo funciones")
+#f2 = open("ejemplo_funciones.ja", "r")
 #case_TestCorrect2 = parser.parse(f2.read())
 
 #f3 = open("ejemplo_objetos.ja", "r")
@@ -1143,17 +1153,17 @@ dError = True
 #f4 = open("ejemplo_ciclos.ja", "r")
 #case_TestCorrect2 = parser.parse(f4.read())
 
-#print("Ejemplo arrays")
-#f5 = open("ejemplo_arreglos.ja", "r")
-#case_TestCorrect2 = parser.parse(f5.read())
+f5 = open("ejemplo_arreglos.ja", "r")
+print("Ejemplo arrays")
+case_TestCorrect2 = parser.parse(f5.read())
 
-#f6 = open("ejemplo_boleanos.ja", "r")
 #case_TestCorrect2 = parser.parse(f6.read())
+#f6 = open("ejemplo_boleanos.ja", "r")
 #print("Ejemplo bool")
 
-print("Ejemplo fibonacci")
-f7 = open("fibonacciIterative.ja", "r")
-case_TestCorrect2 = parser.parse(f7.read())
+#print("Ejemplo fibonacci")
+#case_TestCorrect2 = parser.parse(f7.read())
+#f7 = open("fibonacciIterative.ja", "r")
 
 if (dError == True):
     maquinaVirtual = virtualMachine(
