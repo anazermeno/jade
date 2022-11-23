@@ -322,15 +322,16 @@ def p_type(p):
 
 def p_assign(p):
     '''
-    assign : ASSIGN assign2 endOfExp
+    assign : ASSIGN assign2 SEMICOLON
     '''
-
+    assignQuadruple()
 
 def p_assign2(p):
     '''
-    assign2 : ID EQUAL opadd assign3 
-            | objattraccess EQUAL opadd addOperand
+    assign2 : ID EQUAL assign3 
+            | objattraccess EQUAL addOperand
     '''
+    operatorStack.add("=")
     if p[1] != None:
         if programDirectory.getVarTable().idExist(p[1]):
             operandStack.add(p[1])
@@ -343,15 +344,9 @@ def p_assign2(p):
 
 def p_assign3(p):
     '''
-    assign3 : addOperand
-            | expression addexp
+    assign3 : expression
+            | addOperand
     '''
-
-def p_addexp(p):
-    '''
-    addexp :
-    '''
-    endOfExpresion()
     
 def p_assignArray(p):
     '''
@@ -1009,14 +1004,22 @@ def createParamTemp():
 def assignQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id, '', '', '', '')
-    tempQuad.setOperator(operatorStack)
-    operatorStack.pop()
-    tempQuad.setOperandLeft(operandStack)
-    operandStack.pop()
-    tempQuad.setResult(operandStack.top())
-    operandStack.pop()
-    quadrupleList.append(tempQuad)
-    id += 1
+    typeL = typeStack.pop()
+    typeR = typeStack.top()
+    if CUBE.get(typeL) != None:
+        result = CUBE.get(typeL).get(typeR).get(operatorStack.top())
+        if result == -1:
+            print("Error, no coinciden los tipos")
+            exit()
+        else:
+            tempQuad.setOperator(operatorStack)
+            operatorStack.pop()
+            tempQuad.setOperandLeft(operandStack)
+            operandStack.pop()
+            tempQuad.setResult(operandStack.top())
+            operandStack.pop()
+            quadrupleList.append(tempQuad)
+            id += 1
 
 
 def operationQuadruple():
