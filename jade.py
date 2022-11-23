@@ -356,6 +356,9 @@ def p_assignArray(p):
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL ID SEMICOLON
     '''
     # check bounds quadruple
+    if not programDirectory.getVarTable().idExist(p[3]):
+        print("Error, no se ha declarado el arreglo")
+        exit()
     if p[5] < programDirectory.getVarTable().getItem(p[3]).returnSize() and p[5] >= 0:
         global id
         tempQuad = quadruples.Quadruple(
@@ -668,7 +671,7 @@ def p_funparams(p):
 
 def p_whileloop(p):
     '''
-    whileloop : WHILE whilepoint g_exp CPARENTHESIS gotoF OCURLY block CCURLY whileend
+    whileloop : WHILE whilepoint g_exp endOfExp CPARENTHESIS gotoF OCURLY block CCURLY whileend
     '''
 
 
@@ -1136,21 +1139,21 @@ dError = True
 #print("Ejemplo objetos")
 #case_TestCorrect2 = parser.parse(f3.read())
 
-#f4 = open("ejemplo_ciclos.ja", "r")
 #print("Ejemplo ciclos")
+#f4 = open("ejemplo_ciclos.ja", "r")
 #case_TestCorrect2 = parser.parse(f4.read())
 
-#f5 = open("ejemplo_arreglos.ja", "r")
 #print("Ejemplo arrays")
+#f5 = open("ejemplo_arreglos.ja", "r")
 #case_TestCorrect2 = parser.parse(f5.read())
 
 #f6 = open("ejemplo_boleanos.ja", "r")
 #case_TestCorrect2 = parser.parse(f6.read())
 #print("Ejemplo bool")
 
-f7 = open("fibonacciIterative", "r")
+print("Ejemplo fibonacci")
+f7 = open("fibonacciIterative.ja", "r")
 case_TestCorrect2 = parser.parse(f7.read())
-print("Ejemplo bool")
 
 if (dError == True):
     maquinaVirtual = virtualMachine(

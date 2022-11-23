@@ -116,15 +116,14 @@ class virtualMachine:
             if vara[0:4] == "temp":
                 rightDir = self.directory.getItem(vara).returnDir()
                 vara = self.assignedVars.get(rightDir)
-                print("")
         except:
-            print("")
+            print( end = '')
         try:
             if varb[0:4] == "temp":
                 leftDir = self.directory.getItem(varb).returnDir()
                 varb = self.assignedVars.get(leftDir)
         except:
-            print("")
+            print( end = '')
         if quadruple.getOperator() == '>':
             obj = {self.directory.getItem(
                 quadruple.getResult()).returnDir(): (vara > varb)}
@@ -151,17 +150,14 @@ class virtualMachine:
                 content = self.directory.getItem(var).returnDir()
                 print(self.assignedVars.get(content)) 
             else:
-                print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
-        except:
-            check = self.assignedVars.get(self.directory.getItem(var).returnDir())
-            try:
-                if check[0:4] == "temp":
-                    print(self.assignedVars.get(self.directory.getItem(check).returnDir()))
-            except:        
+                dir1 = self.assignedVars.get(self.directory.getItem(var).returnDir())
+                dir2 = self.directory.getItem(dir1).returnDir()
                 if self.assignedVars.get(var) != None:
-                    print("en except:", self.assignedVars.get(var))
+                    print(self.assignedVars.get(dir2))
                 else:
-                    print("Error: la variable que se intentó imprimir aún no tiene un valor")    
+                    print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
+        except:
+           print(self.assignedVars.get(self.directory.getItem(var).returnDir())) 
 
     def ExecuteQuadruple(self, quadruple):
         self.pointerGlobal += 1 

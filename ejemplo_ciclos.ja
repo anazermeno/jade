@@ -5,8 +5,13 @@ program test4 {
     assign a = 4;
 
     main {
-        for(num = 3 : 10){
-            print(a);
+        var int i;
+        assign i = 1;
+        var int cont;
+        assign cont = 4; 
+        while(i <= cont;){
+            assign i = i + 1;
         }
+        print(cont);
     }
 }
