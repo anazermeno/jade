@@ -1,14 +1,20 @@
 program test4 {
     var int num;
     var int a;
-
     assign a = 4;
+    var float num2;
+    assign num2 = 25.3;
 
     main {
         var int i;
         assign i = 1;
         var int cont;
         assign cont = 4; 
+        var int j;
+        
+        for(j = 0 : 9){
+            print(num2);
+        }
         while(i <= cont;){
             assign i = i + 1;
         }
