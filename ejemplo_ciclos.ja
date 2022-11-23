@@ -3,7 +3,6 @@ program test4 {
     var int a;
 
     assign a = 4;
-    assign a = a + 1 * 2; 
 
     main {
         for(num = 3 : 10){

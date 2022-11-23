@@ -694,19 +694,25 @@ def p_varvalue(p):
             exit()
     elif p[-4] == "for":
         operandStack.add(p[1])
+        typeStack.add("int")
         constdir = Memory.assignDir("constant", "constant", 1)
         programDirectory.getVarTable().addVar(
             p[1], "int", 0, "constant", constdir)
-    #else:
-    #    constdir = Memory.assignDir("constant", "constant", 1)
-    #    if str(type(p[1]))[8:11] == "int":
-    #        programDirectory.getVarTable().addVar(
-    #        p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
-    #    elif str(type(p[1])[8:13]) == "float":
-    #        programDirectory.getVarTable().addVar(
-    #        p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
-    #    operandStack.add(p[1])
-    #    print(operandStack.items)       
+    else:
+        try:
+            constdir = Memory.assignDir("constant", "constant", 1)
+            if str(type(p[1]))[8:11] == "int":
+                typeStack.add("int")
+                programDirectory.getVarTable().addVar(
+                p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
+            elif str(type(p[1])[8:13]) == "float":
+                typeStack.add("float")
+                programDirectory.getVarTable().addVar(
+                p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
+            operandStack.add(p[1])
+        except:
+            operandStack.add(p[1])   
+    #print(operandStack.items)       
 
 
 def p_class(p):
@@ -1024,22 +1030,14 @@ def createParamTemp():
 def assignQuadruple():
     global id
     tempQuad = quadruples.Quadruple(id, '', '', '', '')
-    typeL = typeStack.pop()
-    typeR = typeStack.top()
-    if CUBE.get(typeL) != None:
-        result = CUBE.get(typeL).get(typeR).get(operatorStack.top())
-        if result == -1:
-            print("Error, no coinciden los tipos")
-            exit()
-        else:
-            tempQuad.setOperator(operatorStack)
-            operatorStack.pop()
-            tempQuad.setOperandLeft(operandStack)
-            operandStack.pop()
-            tempQuad.setResult(operandStack.top())
-            operandStack.pop()
-            quadrupleList.append(tempQuad)
-            id += 1
+    tempQuad.setOperator(operatorStack)
+    operatorStack.pop()
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
+    tempQuad.setResult(operandStack.top())
+    operandStack.pop()
+    quadrupleList.append(tempQuad)
+    id += 1
 
 
 def operationQuadruple():
@@ -1142,13 +1140,17 @@ dError = True
 #print("Ejemplo ciclos")
 #case_TestCorrect2 = parser.parse(f4.read())
 
-f5 = open("ejemplo_arreglos.ja", "r")
-print("Ejemplo arrays")
-case_TestCorrect2 = parser.parse(f5.read())
+#f5 = open("ejemplo_arreglos.ja", "r")
+#print("Ejemplo arrays")
+#case_TestCorrect2 = parser.parse(f5.read())
 
 #f6 = open("ejemplo_boleanos.ja", "r")
 #case_TestCorrect2 = parser.parse(f6.read())
 #print("Ejemplo bool")
+
+f7 = open("fibonacciIterative", "r")
+case_TestCorrect2 = parser.parse(f7.read())
+print("Ejemplo bool")
 
 if (dError == True):
     maquinaVirtual = virtualMachine(

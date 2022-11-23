@@ -4,10 +4,13 @@ program test5{
         assign array unid [0] = 20;
         var matrix int primerMat = [12][3];
         var int num;
+        var int i;
+        assign i = 2;
         assign num = 1;
         assign array unid[1] = 10; 
         assign array unid[2] = num;
-
+        assign num = i + 1;
+        print(num);
         print(unid[1]);
     }
 }

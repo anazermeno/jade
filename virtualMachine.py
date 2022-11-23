@@ -146,14 +146,22 @@ class virtualMachine:
         self.assignedVars.update(obj)
 
     def jadeWrite(self, var):
-        if var[0:4] == "temp" or var.isdigit() == False:
-            content = self.directory.getItem(var).returnDir()
-            print(self.assignedVars.get(content))
-        else:
-            if self.assignedVars.get(var) != None:
-                print(self.assignedVars.get(var))
+        try: 
+            if var[0:4] == "temp":
+                content = self.directory.getItem(var).returnDir()
+                print(self.assignedVars.get(content)) 
             else:
-                print("Error: la variable que se intentó imprimir aún no tiene un valor")
+                print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
+        except:
+            check = self.assignedVars.get(self.directory.getItem(var).returnDir())
+            try:
+                if check[0:4] == "temp":
+                    print(self.assignedVars.get(self.directory.getItem(check).returnDir()))
+            except:        
+                if self.assignedVars.get(var) != None:
+                    print("en except:", self.assignedVars.get(var))
+                else:
+                    print("Error: la variable que se intentó imprimir aún no tiene un valor")    
 
     def ExecuteQuadruple(self, quadruple):
         self.pointerGlobal += 1 
