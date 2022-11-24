@@ -187,9 +187,8 @@ lexer = lex.lex()
 
 def p_program(p):
     '''
-    program : PROGRAM createDir OCURLY block main CCURLY
+    program : PROGRAM createDir OCURLY block main CCURLY endprog
     '''
-
 
 def p_createDir(p):
     '''
@@ -207,7 +206,16 @@ def p_createDir(p):
     global id
     tempQuad = quadruples.Quadruple(id, 'goto', '', '', '')
     quadrupleList.append(tempQuad)
-    id += 1   
+    id += 1
+
+def p_endprog(p):
+    '''
+    endprog :
+    '''
+    global id
+    tempQuad = quadruples.Quadruple(id, 'endprog', '', '', '')
+    quadrupleList.append(tempQuad)
+    id += 1
 
 def p_main(p):
     '''
@@ -260,6 +268,7 @@ def p_statement(p):
               | objdeclaration
               | objmethodaccess
               | objattraccess
+              | var
     '''
 
 
@@ -273,7 +282,7 @@ def p_var(p):
     vardir = Memory.assignDir(currScope, p[2], 1)
     name = p[3]
     if currScope == "program" or currScope == "local":
-        programDirectory.getVarTable().addVar(name, p[2], 0, currScope, vardir)
+        programDirectory.getVarTable().addVar(name, p[2], 1, currScope, vardir)
 
 
 def p_varArray(p):
@@ -287,6 +296,7 @@ def p_varArray(p):
 def p_varArray2(p):
     '''
     varArray2 : CTEINT
+              | ID
     '''
     size = p[1]
     currScope = scopeList[len(scopeList)-1]
@@ -323,8 +333,25 @@ def p_type(p):
 def p_assign(p):
     '''
     assign : ASSIGN assign2 SEMICOLON
+           | ASSIGN ID EQUAL ID OBRACKET ID CBRACKET SEMICOLON
+           | ASSIGN ID EQUAL ID OBRACKET CTEINT CBRACKET SEMICOLON
     '''
+    if p[2] != None:  # arreglo
+        operatorStack.add("=")
+        if programDirectory.getVarTable().idExist(p[2]) and programDirectory.getVarTable().idExist(p[4]):
+            if str(type(p[6]))[8:11] != "int" and programDirectory.getVarTable().idExist(p[6]):  # pos is an ID
+                typeStack.add(
+                    programDirectory.getVarTable().getItem(p[4]).returnType())
+                operandStack.add(p[4])
+            elif str(type(p[6]))[8:11] == "int":  # pos is an integer
+                typeStack.add(
+                    programDirectory.getVarTable().getItem(p[4]).returnType())
+                operandStack.add(p[4] + str(p[6]))
+        else:
+            print("Error: La variable no ha sido declarada antes de su uso")
+            exit()
     assignQuadruple()
+
 
 def p_assign2(p):
     '''
@@ -346,18 +373,9 @@ def p_assign3(p):
     '''
     assign3 : expression
             | addOperand
-            | ID OBRACKET ID CBRACKET
-            | ID OBRACKET CTEINT CBRACKET
     '''
-    if p[1] != None: # arreglo0
-        if programDirectory.getVarTable().idExist(p[1]):
-            operandStack.add(p[1]+ " " + programDirectory.getVarTable().getItem(p[3]).returnId())
-            typeStack.add(
-                programDirectory.getVarTable().getItem(p[1]).returnType())
-        else:
-            print("Error: La variable no ha sido declarada antes de su uso")
-            exit()
-    
+
+
 def p_assignArray(p):
     '''
     assignArray : ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL CTEINT SEMICOLON
@@ -365,7 +383,7 @@ def p_assignArray(p):
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL BOOL SEMICOLON
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL ID SEMICOLON
     '''
-    # check bounds quadruple
+    # add quadruple to check bounds
     if not programDirectory.getVarTable().idExist(p[3]):
         print("Error, no se ha declarado el arreglo")
         exit()
@@ -378,16 +396,20 @@ def p_assignArray(p):
     else:
         print("Error: índice fuera de los límites")
         exit()
-    #Go to memory dir
+    # Go to memory dir
     calc = programDirectory.getVarTable().getItem(p[3]).returnSize() - p[5]
     currScope = scopeList[len(scopeList)-1]
     currtype = programDirectory.getVarTable().getItem(p[3]).returnType()
     dir = programDirectory.getVarTable().getItem(p[3]).returnDir() - calc
-    programDirectory.getVarTable().addVar(p[3]+str(p[5]), currtype, 1, currScope, dir)
-    #Assign quadruple
+    programDirectory.getVarTable().addVar(
+        p[3]+str(p[5]), currtype, 1, currScope, dir)
+    # Assign quadruple
     tempQuad = quadruples.Quadruple(id, p[7], p[3]+str(p[5]), '', p[8])
     quadrupleList.append(tempQuad)
+    print(tempQuad.getOperator(), tempQuad.getOperandLeft(),
+          tempQuad.getOperandRight(), tempQuad.getResult())
     id += 1
+
 
 def p_assignMatrix(p):
     '''
@@ -434,9 +456,10 @@ def p_write(p):
 def p_write2(p):
     '''
     write2 : expression printparam write3
-           | ID OBRACKET CTEINT CBRACKET 
+           | ID OBRACKET CTEINT CBRACKET
+           | ID OBRACKET ID CBRACKET  
     '''
-    if(p[1] != None): #print array cell
+    if (p[1] != None):  # print array cell
         global id
         tempQuad = quadruples.Quadruple(id, 'print', '', '', '')
         tempQuad.setResult(p[1]+str(p[3]))
@@ -477,7 +500,7 @@ def p_read(p):
 
 def p_fun(p):
     ''' 
-    fun : FUN fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block CCURLY endfun
+    fun : FUN fun_addFun OPARENTHESIS funparams CPARENTHESIS OCURLY block return CCURLY endfun
     '''
 
 
@@ -510,9 +533,14 @@ def p_funcall2(p):
 
 def p_forloop(p):
     '''
-    forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON forcontrol for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
+    forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON forcontrol for_endexpcond CPARENTHESIS OCURLY forstatements CCURLY for_end
     '''
 
+def p_forstatements(p):
+    '''
+    forstatements : statement forstatements
+                  | empty
+    '''
 
 def p_forcontrol(p):
     '''
@@ -520,7 +548,7 @@ def p_forcontrol(p):
     '''
     operandStack.add(p[1])
     constdir = Memory.assignDir("constant", "constant", 1)
-    programDirectory.getVarTable().addVar(p[1], "int", 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(p[1], "int", 1, "constant", constdir)
 
 
 def p_expression(p):
@@ -580,6 +608,7 @@ def p_m_exp2(p):
            | MINUS opadd m_exp
            | empty
     '''
+
 
 def p_t(p):
     '''
@@ -658,6 +687,7 @@ def p_params(p):
            | empty
     '''
 
+
 def p_params2(p):
     '''
     params2 : COMMA params
@@ -673,7 +703,7 @@ def p_funparams(p):
               | empty
     '''
     constdir = Memory.assignDir("local", p[1], 1)
-    programDirectory.getVarTable().addVar(p[2], p[1], 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(p[2], p[1], 1, "constant", constdir)
     for i in eraData:
         if i[0] == currFun:
             i[1].append(p[2])
@@ -710,22 +740,21 @@ def p_varvalue(p):
         typeStack.add("int")
         constdir = Memory.assignDir("constant", "constant", 1)
         programDirectory.getVarTable().addVar(
-            p[1], "int", 0, "constant", constdir)
+            p[1], "int", 1, "constant", constdir)
     else:
         try:
             constdir = Memory.assignDir("constant", "constant", 1)
             if str(type(p[1]))[8:11] == "int":
                 typeStack.add("int")
                 programDirectory.getVarTable().addVar(
-                p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
+                    p[1], str(type(p[1]))[8:11], 1, "constant", constdir)
             elif str(type(p[1])[8:13]) == "float":
                 typeStack.add("float")
                 programDirectory.getVarTable().addVar(
-                p[1], str(type(p[1]))[8:13], 0, "constant", constdir)     
+                    p[1], str(type(p[1]))[8:13], 1, "constant", constdir)
             operandStack.add(p[1])
         except:
-            operandStack.add(p[1])   
-    #print(operandStack.items)       
+            operandStack.add(p[1])
 
 
 def p_class(p):
@@ -758,6 +787,7 @@ def p_addclass(p):
 def p_objconstructor(p):
     '''
     objconstructor : CLASSID OPARENTHESIS params CPARENTHESIS block
+                   | empty
     '''
 
 
@@ -783,7 +813,8 @@ def p_objattraccess(p):
 
 def p_return(p):
     '''
-    return : RETURN ID endOfExp
+    return : RETURN ID SEMICOLON
+           | empty
     '''
 
 
@@ -850,12 +881,14 @@ def p_addparam(p):
         operandStack.add(p[-1])
         typeStack.add("int")
         constdir = Memory.assignDir("constant", "constant", 1)
-        programDirectory.getVarTable().addVar(p[-1], "int", 1, "constant", constdir)
-    elif  str(type(p[-1]))[8:13] == "float":
+        programDirectory.getVarTable().addVar(
+            p[-1], "int", 1, "constant", constdir)
+    elif str(type(p[-1]))[8:13] == "float":
         operandStack.add(p[-1])
         typeStack.add("float")
         constdir = Memory.assignDir("constant", "constant", 1)
-        programDirectory.getVarTable().addVar(p[-1], "float", 1, "constant", constdir) 
+        programDirectory.getVarTable().addVar(
+            p[-1], "float", 1, "constant", constdir)
     if programDirectory.getVarTable().idExist(p[-1]):
         operandStack.add(p[-1])
         typeStack.add(
@@ -972,7 +1005,7 @@ def p_for_end(p):
     global id
     global vcontrol
     constdir = Memory.assignDir("constant", "constant", 1)
-    programDirectory.getVarTable().addVar(1, "int", 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(1, "int", 1, "constant", constdir)
     tempQuad = quadruples.Quadruple(id, '+', vcontrol, 1, '')
     ty = createTemp()
     tempQuad.setResult(ty)
@@ -1015,7 +1048,7 @@ def createTemp():
     myTemp = "temp" + str(idTemp)
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, "int", 1)
-    programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
+    programDirectory.getVarTable().addVar(myTemp, "int", 1, currScope, vardir)
     return myTemp
 
 
@@ -1025,7 +1058,7 @@ def createTempFun(newType):
     myTemp = "temp" + str(idTemp)
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, "int", 1)
-    programDirectory.getVarTable().addVar(myTemp, newType, 0, currScope, vardir)
+    programDirectory.getVarTable().addVar(myTemp, newType, 1, currScope, vardir)
     return myTemp
 
 
@@ -1036,7 +1069,7 @@ def createParamTemp():
     currScope = scopeList[len(scopeList)-1]
     # cambiar para enviar verdadero tipo
     vardir = Memory.assignDir(currScope, "int", 1)
-    programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
+    programDirectory.getVarTable().addVar(myTemp, "int", 1, currScope, vardir)
     return myTemp
 
 
@@ -1149,23 +1182,26 @@ dError = True
 #print("Ejemplo objetos")
 #case_TestCorrect2 = parser.parse(f3.read())
 
-#print("Ejemplo ciclos")
 #f4 = open("ejemplo_ciclos.ja", "r")
+#print("Ejemplo ciclos")
 #case_TestCorrect2 = parser.parse(f4.read())
 
-f5 = open("ejemplo_arreglos.ja", "r")
-print("Ejemplo arrays")
-case_TestCorrect2 = parser.parse(f5.read())
+#print("Ejemplo arrays")
+#f5 = open("ejemplo_arreglos.ja", "r")
+#case_TestCorrect2 = parser.parse(f5.read())
 
-#case_TestCorrect2 = parser.parse(f6.read())
 #f6 = open("ejemplo_boleanos.ja", "r")
+#case_TestCorrect2 = parser.parse(f6.read())
 #print("Ejemplo bool")
 
-#print("Ejemplo fibonacci")
-#case_TestCorrect2 = parser.parse(f7.read())
-#f7 = open("fibonacciIterative.ja", "r")
+print("Ejemplo fibonacci")
+f7 = open("fibonacciIterative.ja", "r")
+case_TestCorrect2 = parser.parse(f7.read())
+
 
 if (dError == True):
+    #for quadruple in quadrupleList:
+    #    print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()

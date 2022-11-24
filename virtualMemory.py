@@ -6,9 +6,9 @@
 # GLOBAL BOOL --> 5000 - 6999
 
 # LOCAL INT --> 7000 - 8999
-# LOCAL FLOAT --> 9000 11999
-# LOCAL BOOL --> 12000 13999
-# CONSTANTS -->  14000 - 15999
+# LOCAL FLOAT --> 9000 9999
+# LOCAL BOOL --> 1000 11999
+# CONSTANTS -->  12000 - 14999
 
 MAX_PER_VAR = 2000
 
@@ -58,7 +58,7 @@ class Memory:
                 LOCAL_INT += size
                 cLOCAL_INT += size
                 return LOCAL_INT
-            elif type == "float" and LOCAL_FLOAT < 10999:
+            elif type == "float" and LOCAL_FLOAT < 9999:
                 LOCAL_FLOAT += size
                 cLOCAL_FLOAT += size
                 return LOCAL_FLOAT

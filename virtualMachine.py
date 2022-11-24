@@ -44,17 +44,21 @@ class virtualMachine:
     def jadeSub(self, left, right, result):
         leftDir = self.directory.getItem(left).returnDir()
         rightDir = self.directory.getItem(right).returnDir()
-        if right[0:4] == "temp":
-            rightDir = self.directory.getItem(right).returnDir()
-        if left[0:4] == "temp":
-            leftDir = self.directory.getItem(left).returnDir()
-        vara = 0
-        varb = 0
-        for i in self.assignedVars:
-            if i == leftDir:
-                vara += self.assignedVars.get(i)
-            if i == rightDir:
-                varb += self.assignedVars.get(i)
+        if rightDir >= 12000:
+            varb = int(self.directory.getItem(right).returnId())
+        else:
+            varb = self.assignedVars.get(rightDir)
+        if leftDir >= 12000:
+            vara = int(self.directory.getItem(left).returnId())
+        else:
+            vara = self.assignedVars.get(leftDir)
+        try:
+            if vara[0:4] == "temp":
+                vara = self.assignedVars.get(self.directory.getItem(vara).returnDir())
+            elif varb[0:4] == "temp":
+                varb = self.assignedVars.get(self.directory.getItem(varb).returnDir())
+        except:
+            print(end='')        
         obj = {self.directory.getItem(result).returnDir(): (vara - varb)}
         self.assignedVars.update(obj)
 
@@ -202,7 +206,7 @@ class virtualMachine:
             self.jadeGoSub(quadruple.getResult())    
         elif quadruple.getOperator() == 'print':
             self.jadeWrite(quadruple.getResult())
-        if self.pointerGlobal == len(self.quadruples):
+        elif quadruple.getOperator() == 'endprog':
             exit()      
         #print("pointer global: ", self.pointerGlobal, "cuad:", quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight())    
          
