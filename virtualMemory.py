@@ -23,14 +23,65 @@ LOCAL_INT = 7000
 cLOCAL_INT = 0
 LOCAL_FLOAT = 9000
 cLOCAL_FLOAT = 0
-LOCAL_BOOL = 10000
+LOCAL_BOOL = 11000
 cLOCAL_BOOL = 0
 
-CONSTANTDIR = 12000
+CONSTANTDIR = 13000
 cCONSTANTS = 0
 
 
 class Memory:
+    # global vars
+    def sumGlobalInt():
+        global cGLOBAL_INT
+        cGLOBAL_INT +=1
+
+    def getGlobalInt():
+        return cGLOBAL_INT
+
+    def sumGlobalFloat():
+        global cGLOBAL_FLOAT
+        cGLOBAL_FLOAT +=1
+
+    def getGlobalFloat():
+        return cGLOBAL_FLOAT  
+
+    def sumGlobalBool():
+        global cGLOBAL_BOOL
+        cGLOBAL_BOOL +=1
+
+    def getGlobalBool():
+        return cGLOBAL_BOOL
+
+    # local vars
+    def sumLocalInt():
+        global cLOCAL_INT
+        cLOCAL_INT +=1
+
+    def getLocalInt():
+        return cLOCAL_INT
+
+    def sumLocalFloat():
+        global cLOCAL_FLOAT
+        cLOCAL_FLOAT +=1
+
+    def getLocalFloat():
+        return cLOCAL_FLOAT  
+
+    def sumLocalBool():
+        global cLOCAL_BOOL
+        cLOCAL_BOOL +=1
+
+    def getLocalBool():
+        return cLOCAL_BOOL              
+
+    # constant vars
+    def sumConstant():
+        global cCONSTANTS
+        cCONSTANTS +=1
+
+    def getConstant():
+        return cCONSTANTS 
 
     def assignDir(scope: str, type: str, size: int):
         global GLOBAL_INT, GLOBAL_FLOAT, GLOBAL_BOOL
@@ -43,33 +94,26 @@ class Memory:
         if scope == "program":
             if type == "int" and GLOBAL_INT < 2999:
                 GLOBAL_INT += size
-                cGLOBAL_INT += size
                 return GLOBAL_INT
             elif type == "float" and GLOBAL_FLOAT < 4999:
                 GLOBAL_FLOAT += size
-                cGLOBAL_FLOAT += size
                 return GLOBAL_FLOAT
             elif type == "bool" and GLOBAL_BOOL < 6999:
                 GLOBAL_BOOL += size
-                cGLOBAL_BOOL += size
                 return GLOBAL_BOOL
         elif scope == "local":
             if type == "int" and LOCAL_INT < 8999:
                 LOCAL_INT += size
-                cLOCAL_INT += size
                 return LOCAL_INT
             elif type == "float" and LOCAL_FLOAT < 10999:
                 LOCAL_FLOAT += size
-                cLOCAL_FLOAT += size
                 return LOCAL_FLOAT
-            elif type == "bool" and LOCAL_BOOL < 11999:
+            elif type == "bool" and LOCAL_BOOL < 12999:
                 LOCAL_BOOL += size
-                cLOCAL_BOOL += size
                 return LOCAL_BOOL
         elif scope == "constant":
-            if type == "constant" and CONSTANTDIR < 13999:
+            if type == "constant" and CONSTANTDIR < 14999:
                 CONSTANTDIR += size
-                cCONSTANTS += size
                 return CONSTANTDIR
         else:
             return 0

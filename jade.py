@@ -272,8 +272,21 @@ def p_var(p):
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, p[2], 1)
     name = p[3]
-    if currScope == "program" or currScope == "local":
-        programDirectory.getVarTable().addVar(name, p[2], 0, currScope, vardir)
+    if currScope == "program":
+        if p[2] == "int":
+            Memory.sumGlobalInt()
+        elif p[2] == "float":
+            Memory.sumGlobalFloat()
+        elif p[2] == "bool":
+            Memory.sumGlobalBool()    
+    elif currScope == "local":
+        if p[2] == "int":
+            Memory.sumLocalInt()
+        elif p[2] == "float":
+            Memory.sumLocalFloat()
+        elif p[2] == "bool":
+            Memory.sumLocalBool()  
+    programDirectory.getVarTable().addVar(name, p[2], 0, currScope, vardir)
 
 
 def p_varArray(p):
@@ -289,10 +302,10 @@ def p_varArray2(p):
     varArray2 : CTEINT
     '''
     size = p[1]
+    Memory.sumConstant()
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, p[-4], size)
-    programDirectory.getVarTable().addVar(p[-3],
-                                          p[-4], size, currScope, vardir)
+    programDirectory.getVarTable().addVar(p[-3],p[-4], size, currScope, vardir)
 
 
 def p_varMatrix(p):
@@ -519,6 +532,7 @@ def p_forcontrol(p):
     forcontrol : CTEINT
     '''
     operandStack.add(p[1])
+    Memory.sumConstant()
     constdir = Memory.assignDir("constant", "constant", 1)
     programDirectory.getVarTable().addVar(p[1], "int", 0, "constant", constdir)
 
@@ -672,6 +686,12 @@ def p_funparams(p):
               | BOOL ID
               | empty
     '''
+    if p[1] == "int":
+        Memory.sumLocalInt
+    elif p[1] == "float":
+        Memory.sumLocalFloat()
+    elif p[1] == "bool":
+        Memory.sumLocalBool()        
     constdir = Memory.assignDir("local", p[1], 1)
     programDirectory.getVarTable().addVar(p[2], p[1], 0, "constant", constdir)
     for i in eraData:
@@ -1025,7 +1045,7 @@ def createTempFun(newType):
     myTemp = "temp" + str(idTemp)
     currScope = scopeList[len(scopeList)-1]
     vardir = Memory.assignDir(currScope, "int", 1)
-    programDirectory.getVarTable().addVar(myTemp, newType, 0, currScope, vardir)
+    programDirectory.getVarTable().addVar(myTemp, newType, 1, currScope, vardir)
     return myTemp
 
 
@@ -1136,6 +1156,19 @@ def p_goto(p):
 # Build the parser
 parser = yacc()
 dError = True
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("")
+print("Jade compiler")
 
 #f = open("ejemplo_aritmetico.ja", "r")
 #print("Ejemplo arimético")
@@ -1149,13 +1182,13 @@ dError = True
 #print("Ejemplo objetos")
 #case_TestCorrect2 = parser.parse(f3.read())
 
-#print("Ejemplo ciclos")
-#f4 = open("ejemplo_ciclos.ja", "r")
-#case_TestCorrect2 = parser.parse(f4.read())
+print("Ejemplo ciclos")
+f4 = open("ejemplo_ciclos.ja", "r")
+case_TestCorrect2 = parser.parse(f4.read())
 
-f5 = open("ejemplo_arreglos.ja", "r")
-print("Ejemplo arrays")
-case_TestCorrect2 = parser.parse(f5.read())
+#f5 = open("ejemplo_arreglos.ja", "r")
+#print("Ejemplo arrays")
+#case_TestCorrect2 = parser.parse(f5.read())
 
 #case_TestCorrect2 = parser.parse(f6.read())
 #f6 = open("ejemplo_boleanos.ja", "r")
@@ -1166,6 +1199,8 @@ case_TestCorrect2 = parser.parse(f5.read())
 #f7 = open("fibonacciIterative.ja", "r")
 
 if (dError == True):
+    print("gInt", Memory.getGlobalInt(), "gFloat", Memory.getGlobalFloat(), "gBool", Memory.getGlobalBool())
+    print("lInt", Memory.getLocalInt(), "lFloat", Memory.getLocalFloat(), "lBool", Memory.getLocalBool())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
