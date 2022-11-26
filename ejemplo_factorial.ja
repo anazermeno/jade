@@ -7,7 +7,9 @@ program test12{
         assign myFact = 1;
         var int i;
 
-        for(i=1 : 6){
+        read n;
+        
+        for(i=1 : n+1){
            assign myFact = myFact * i; 
         }
         print(myFact);

@@ -1,0 +1,9 @@
+program inputoutput{
+
+    main{
+        var int num;
+        read num;
+        
+        print(num);
+    }
+}

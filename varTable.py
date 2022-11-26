@@ -2,11 +2,10 @@
 class VariableTable:
 
     def __init__(self):
-        global table
-        table = []  # empty matrix
+        self.table = []  # empty matrix
 
     def idExist(self, id):
-        for item in table:
+        for item in self.table:
             if item.id == id:
                 return True
         return False
@@ -21,19 +20,21 @@ class VariableTable:
     def addVar(self, id, type, size, scope, dir=0):
         if (self.validateType(type) and not self.idExist(id)):
             newVar = varReg(id, type, size, scope, dir)
-            table.append(newVar)
+            self.table.append(newVar)
 
     def printContent(self):
-        for item in table:
+        for item in self.table:
             item.printItem()
 
     def getItem(self, id):
-        for item in table:
+        for item in self.table:
             if item.id == id:
                 return item
         return False
 
+    def getTable(self):
 
+        return self.table
 class varReg:
 
     def __init__(self, id, type, size, scope, dir=0):

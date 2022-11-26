@@ -91,7 +91,7 @@ class Memory:
         global CONSTANTDIR
         global cCONSTANTS
 
-        if scope == "program":
+        if scope == "global":
             if type == "int" and GLOBAL_INT < 2999:
                 GLOBAL_INT += size
                 return GLOBAL_INT

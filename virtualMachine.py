@@ -21,8 +21,8 @@ class virtualMachine:
             else:
                 result += self.assignedVars.get(rightDir)
         except:
-            rightDir = right
-            result += right
+            rightDir = self.directory.getItem(right).returnDir()
+            result += self.assignedVars.get(rightDir)
         try:
             if left[0:4] == "temp":
                 leftDir = self.directory.getItem(left).returnDir()
@@ -36,8 +36,8 @@ class virtualMachine:
                 except:
                     result += self.assignedVars.get(leftDir)
         except:
-            leftDir = left
-            result += left
+            leftDir = self.directory.getItem(left).returnDir()
+            result += self.assignedVars.get(leftDir)
         obj = {self.directory.getItem(opresult).returnDir(): result}
         self.assignedVars.update(obj)
 
@@ -112,9 +112,16 @@ class virtualMachine:
         leftDir = self.directory.getItem(
             quadruple.getOperandLeft()).returnDir()
         rightDir = self.directory.getItem(
-            quadruple.getOperandRight()).returnDir()
+            quadruple.getOperandRight()).returnDir()          
         vara = self.assignedVars.get(leftDir)
         varb = self.assignedVars.get(rightDir)
+        try:
+            if self.assignedVars.get(self.directory.getItem(vara).returnDir()) != None:
+                vara = self.assignedVars.get(self.directory.getItem(vara).returnDir())
+            if self.assignedVars.get(self.directory.getItem(varb).returnDir()) != None:
+                varb = self.assignedVars.get(self.directory.getItem(varb).returnDir())
+        except:
+            print(end='')   
         try:
             if vara[0:4] == "temp":
                 rightDir = self.directory.getItem(vara).returnDir()
@@ -148,10 +155,10 @@ class virtualMachine:
         self.assignedVars.update(obj)
 
     def jadeWrite(self, var):
+        self.directory.printContent()
         try:
             if var[0:4] == "temp":
                 content = self.directory.getItem(var).returnDir()
-                print(self.assignedVars.get(content))
             else:
                 dir1 = self.assignedVars.get(
                     self.directory.getItem(var).returnDir())
@@ -162,7 +169,8 @@ class virtualMachine:
                     print(self.assignedVars.get(
                         self.directory.getItem(var).returnDir()))
         except:
-            print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
+            print("var", var, "dir", self.directory.getItem(var).returnDir())
+            #print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
 
     def ExecuteQuadruple(self, quadruple):
         self.pointerGlobal += 1
@@ -179,10 +187,13 @@ class virtualMachine:
             self.jadeDiv(quadruple.getOperandLeft(),
                          quadruple.getOperandRight(), quadruple.getResult())
         elif quadruple.getOperator() == '=':
-            dir = self.directory.getItem(
-                quadruple.getOperandLeft()).returnDir()
-            obj = {dir: quadruple.getResult()}
-            self.assignedVars.update(obj)
+            if self.quadruples[quadruple.getId()-1].getOperator() == "VER":
+                print("RESOLVER JUNTOS") 
+            else:    
+                dir = self.directory.getItem(
+                    quadruple.getOperandLeft()).returnDir()
+                obj = {dir: quadruple.getResult()}
+                self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'ERA':
             global currFun
             currFun = quadruple.getResult()
@@ -205,6 +216,22 @@ class virtualMachine:
                 self.jadeGoto(self.pointerGlobal)
         elif quadruple.getOperator() == 'GOSUB':
             self.jadeGoSub(quadruple.getResult())
+        elif quadruple.getOperator() == 'RETURN':
+            print("return quad en mv")
+        elif quadruple.getOperator() == 'VER':
+            #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())          
+            print("HOLA")
+        elif quadruple.getOperator() == 'READ':
+            dir = self.directory.getItem(
+                quadruple.getResult()).returnDir()
+            if self.directory.getItem(
+                quadruple.getResult()).returnType() == "int":  
+                result = int(input())
+            elif self.directory.getItem(
+                quadruple.getResult()).returnType() == "float":  
+                result = float(input())    
+            obj = {dir: result}
+            self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'print':
             self.jadeWrite(quadruple.getResult())
         if self.pointerGlobal == len(self.quadruples):
@@ -213,12 +240,18 @@ class virtualMachine:
     def virtualMachineStart(self):
         # look for assignment of global variables
         for i in range(0, self.quadruples[0].getResult()):
-            if self.quadruples[i].getOperator() == '=':
+            if self.quadruples[i].getOperator() == '=' and self.directory.getItem(
+                    self.quadruples[i].getOperandLeft()).returnScope() == "global":
                 dir = self.directory.getItem(
                     self.quadruples[i].getOperandLeft()).returnDir()
                 obj = {dir: self.quadruples[i].getResult()}
                 self.assignedVars.update(obj)
-
+        # look for constants
+        for i in self.directory.table: 
+            if i.returnScope() == "constant":
+                dir = i.returnDir()
+                obj = {dir: i.returnId()}
+                self.assignedVars.update(obj)
         if self.quadruples[0].getOperator() == 'goto':
             self.pointerGlobal = self.quadruples[0].getResult()
             self.jadeGoto(self.pointerGlobal)
