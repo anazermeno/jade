@@ -523,7 +523,7 @@ def p_funcall2(p):
 
 def p_forloop(p):
     '''
-    forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON forcontrol for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
+    forloop : FOR OPARENTHESIS for_id EQUAL expression for_endexpid COLON expression for_endexpcond CPARENTHESIS OCURLY statement CCURLY for_end
     '''
 
 
@@ -1170,8 +1170,8 @@ print("")
 print("")
 print("Jade compiler")
 
-#f = open("ejemplo_aritmetico.ja", "r")
 #print("Ejemplo arimético")
+#f = open("ejemplo_aritmetico.ja", "r")
 #case_TestCorrect = parser.parse(f.read())
 
 #print("Ejemplo funciones")
@@ -1182,16 +1182,20 @@ print("Jade compiler")
 #print("Ejemplo objetos")
 #case_TestCorrect2 = parser.parse(f3.read())
 
-print("Ejemplo ciclos")
-f4 = open("ejemplo_ciclos.ja", "r")
+#print("Ejemplo ciclos")
+#case_TestCorrect2 = parser.parse(f4.read())
+#f4 = open("ejemplo_ciclos.ja", "r")
+
+print("Ejemplo factorial")
+f4 = open("ejemplo_factorial.ja", "r")
 case_TestCorrect2 = parser.parse(f4.read())
 
 #f5 = open("ejemplo_arreglos.ja", "r")
 #print("Ejemplo arrays")
 #case_TestCorrect2 = parser.parse(f5.read())
 
-#case_TestCorrect2 = parser.parse(f6.read())
 #f6 = open("ejemplo_boleanos.ja", "r")
+#case_TestCorrect2 = parser.parse(f6.read())
 #print("Ejemplo bool")
 
 #print("Ejemplo fibonacci")
@@ -1199,8 +1203,8 @@ case_TestCorrect2 = parser.parse(f4.read())
 #f7 = open("fibonacciIterative.ja", "r")
 
 if (dError == True):
-    print("gInt", Memory.getGlobalInt(), "gFloat", Memory.getGlobalFloat(), "gBool", Memory.getGlobalBool())
-    print("lInt", Memory.getLocalInt(), "lFloat", Memory.getLocalFloat(), "lBool", Memory.getLocalBool())
+    #print("gInt", Memory.getGlobalInt(), "gFloat", Memory.getGlobalFloat(), "gBool", Memory.getGlobalBool())
+   # print("lInt", Memory.getLocalInt(), "lFloat", Memory.getLocalFloat(), "lBool", Memory.getLocalBool())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()

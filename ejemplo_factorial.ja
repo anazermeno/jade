@@ -1,0 +1,15 @@
+program test12{
+
+    main{
+        var int n;
+        assign n = 5;
+        var int myFact;
+        assign myFact = 1;
+        var int i;
+
+        for(i=1 : 6){
+           assign myFact = myFact * i; 
+        }
+        print(myFact);
+    }
+}
