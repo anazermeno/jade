@@ -15,9 +15,7 @@ program find {
 
         for(i = 0 : 6){
             assign prov = arreglo1[i];
-            print(prov);
             if(prov == num){
-                print(i);
                 assign existe = 1;
             }
         }

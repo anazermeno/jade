@@ -236,6 +236,21 @@ class virtualMachine:
                 arrdir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
                 obj = {arrdir + calc: quadruple.getResult()}
                 self.assignedVars.update(obj)
+            elif quadruple.getOperandRight() != '':
+                vardir = self.directory.getItem(quadruple.getResult()).returnDir() #direccion final del arreglo
+                size = self.directory.getItem(quadruple.getResult()).returnSize() #tamaño del arreglo
+                posdir = self.directory.getItem(quadruple.getOperandRight()).returnDir() # direccion id
+                result = self.assignedVars.get(posdir) #resultado dir
+                try:
+                    if result[0:4] == "temp":
+                        dir2 = self.directory.getItem(result).returnDir()
+                        result = self.assignedVars.get(dir2)
+                except:
+                    print(end='')        
+                dir = self.directory.getItem(
+                    quadruple.getOperandLeft()).returnDir()
+                obj = {dir: result}
+                self.assignedVars.update(obj)
             else:    
                 dir = self.directory.getItem(
                     quadruple.getOperandLeft()).returnDir()
@@ -279,7 +294,7 @@ class virtualMachine:
             obj = {dir: result}
             self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'print':
-            if quadruple.getOperandLeft() == None:
+            if quadruple.getOperandLeft() == '':
                 self.jadeWrite(quadruple.getResult())
             else:
                 # check if constant 
@@ -294,7 +309,7 @@ class virtualMachine:
                     calc = self.directory.getItem(quadruple.getResult()).returnSize() - val
                     direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
                     print(self.assignedVars.get(direspecifica))
-                    
+
         if self.pointerGlobal == len(self.quadruples):
             exit()
 

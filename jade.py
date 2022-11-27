@@ -402,12 +402,20 @@ def p_assign3(p):
             | ID OBRACKET ID CBRACKET
             | ID OBRACKET CTEINT CBRACKET
     '''
-    if p[1] != None:  # arreglo0
-        if programDirectory.getVarTable().idExist(p[1]) and programDirectory.getVarTable().idExist(p[3]):
-            operandStack.add(
-                p[1] + " " + programDirectory.getVarTable().getItem(p[3]).returnId())
+    if p[1] != None:  # arreglo
+        if programDirectory.getVarTable().idExist(p[1]) and str(type(p[3]))[8:11] == "int":
+            operandStack.add(p[3])
+            operandStack.add(p[1])
+            constDir = Memory.assignDir("constant", "constant", 1)
+            programDirectory.getVarTable().addVar(
+                p[3], "constant", 1, "constant", constDir)
             typeStack.add(
                 programDirectory.getVarTable().getItem(p[1]).returnType())
+        elif programDirectory.getVarTable().idExist(p[1]) and programDirectory.getVarTable().idExist(p[3]):   
+            operandStack.add(p[3])
+            operandStack.add(p[1])
+            typeStack.add(
+                programDirectory.getVarTable().getItem(p[1]).returnType()) 
         else:
             print("Error", p[1], p[3])
             print("Error: La variable no ha sido declarada antes de su uso")
@@ -1189,8 +1197,12 @@ def assignQuadruple():
     operatorStack.pop()
     tempQuad.setOperandLeft(operandStack)
     operandStack.pop()
-    tempQuad.setResult(operandStack.top())
+    top = operandStack.top()
+    tempQuad.setResult(top)
     operandStack.pop()
+    if programDirectory.getVarTable().getItem(top).returnSize() > 1:
+        tempQuad.setOperandRight(operandStack)
+        operandStack.pop()
     quadrupleList.append(tempQuad)
     id += 1
 
@@ -1300,7 +1312,7 @@ case_TestCorrect2 = parser.parse(f5.read())
 
 if (dError == True):
     #for quadruple in quadrupleList:
-    #     print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
+    #   print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
