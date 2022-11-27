@@ -11,6 +11,6 @@ program test5{
         assign array unid[3] = num;
         assign num = i + 1;
 
-        print(unid[2]);
+        print(unid[i]);
     }
 }

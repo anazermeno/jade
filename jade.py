@@ -517,11 +517,16 @@ def p_write2(p):
     '''
     write2 : expression printparam write3
            | ID OBRACKET CTEINT CBRACKET 
+           | ID OBRACKET ID CBRACKET
     '''
-    if (p[1] != None):  # print array cell
+    if p[3] != None:  # print array cell with int
+        if str(type(p[3]))[8:11] == "int":
+            constDir = Memory.assignDir("constant", "constant", 1)
+            programDirectory.getVarTable().addVar(
+                p[3], "int", 1, "constant", constDir)
         global id
-        tempQuad = quadruples.Quadruple(id, 'print', '', '', '')
-        tempQuad.setResult(p[1]+str(p[3]))
+        tempQuad = quadruples.Quadruple(id, 'print', p[3], '', p[1])
+        tempQuad.setResult(p[1])
         quadrupleList.append(tempQuad)
         id += 1
 

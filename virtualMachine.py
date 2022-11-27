@@ -279,7 +279,22 @@ class virtualMachine:
             obj = {dir: result}
             self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'print':
-            self.jadeWrite(quadruple.getResult())
+            if quadruple.getOperandLeft() == None:
+                self.jadeWrite(quadruple.getResult())
+            else:
+                # check if constant 
+                if self.directory.getItem(quadruple.getOperandLeft()).returnScope() == "constant":
+                    size = self.directory.getItem(quadruple.getOperandLeft()).returnId()
+                    calc = self.directory.getItem(quadruple.getResult()).returnSize() - size
+                    direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
+                    print(self.assignedVars.get(direspecifica))
+                else:
+                    valdir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
+                    val = self.assignedVars.get(valdir)
+                    calc = self.directory.getItem(quadruple.getResult()).returnSize() - val
+                    direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
+                    print(self.assignedVars.get(direspecifica))
+                    
         if self.pointerGlobal == len(self.quadruples):
             exit()
 
