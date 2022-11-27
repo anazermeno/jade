@@ -342,13 +342,32 @@ def p_type(p):
         typeStack.add(p[1])
 
     programDirectory.setType(p[1])
+def p_funcall(p):
+    ''' 
+    funcall : ID era OPARENTHESIS funcall2 CPARENTHESIS SEMICOLON gosub
+    '''
+    if p[-1] == "=":
+        global currFun
+        currFun = p[1]
 
+def p_funcall2(p):
+    ''' 
+    funcall2 : params
+             | empty
+    '''
 
 def p_assign(p):
     '''
     assign : ASSIGN assign2 SEMICOLON
+           | ASSIGN ID EQUAL funcall SEMICOLON
     '''
-    assignQuadruple()
+    if p[2] != None:
+        global id, currFun
+        tempQuad = quadruples.Quadruple(id, '=', p[2], '', currFun)
+        quadrupleList.append(tempQuad)
+        id += 1
+    else:
+        assignQuadruple()
 
 
 def p_assign2(p):
@@ -371,7 +390,6 @@ def p_assign3(p):
     '''
     assign3 : expression
             | addOperand
-            | funcall
             | ID OBRACKET ID CBRACKET
             | ID OBRACKET CTEINT CBRACKET
     '''
@@ -390,10 +408,10 @@ def p_assign3(p):
 
 def p_assignArray(p):
     '''
-    assignArray : ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL CTEINT SEMICOLON verquad
-                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL CTEFLOAT SEMICOLON verquad
-                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL BOOL SEMICOLON verquad
-                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL ID SEMICOLON verquad
+    assignArray : ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL CTEINT SEMICOLON 
+                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL CTEFLOAT SEMICOLON 
+                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL BOOL SEMICOLON 
+                | ASSIGN ARRAY ID OBRACKET expression CBRACKET EQUAL ID SEMICOLON 
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL CTEINT SEMICOLON
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL CTEFLOAT SEMICOLON
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL BOOL SEMICOLON
@@ -405,8 +423,11 @@ def p_assignArray(p):
         exit()
     
     global id
-    if str(type(p[5]))[8:10] == "int":
+    if str(type(p[5]))[8:11] == "int":
         if p[5] >=0: 
+            # agregar entero a tabla de variables 
+            constDir = Memory.assignDir("constant", "constant", 1)
+            programDirectory.getVarTable().addVar(p[5], "constant", 1, "constant", constDir)
             tempQuad = quadruples.Quadruple(id, 'VER', p[5], programDirectory.getVarTable().getItem(p[3]).returnSize(), p[3])
             quadrupleList.append(tempQuad)
             id += 1
@@ -418,24 +439,17 @@ def p_assignArray(p):
             programDirectory.getVarTable().addVar(
                 p[3]+str(p[5]), currtype, 1, currScope, dir)
             # Assign quadruple
-            tempQuad = quadruples.Quadruple(id, p[7], p[3]+str(p[5]), '', p[8])
+            tempQuad = quadruples.Quadruple(id, p[7], p[3], p[5], p[8])
             quadrupleList.append(tempQuad)
             id += 1
         else:
             print("Error, el tamaño debe ser mayor a 0")
             exit()    
     else:
-        operandStack.add(p[8])
+        operandStack.add(p[8]) 
         operandStack.add(p[3])
-        global tempsize 
-        tempsize = programDirectory.getVarTable().getItem(p[3]).returnSize()
+        verQuadruple (programDirectory.getVarTable().getItem(p[3]).returnSize())
         
-
-def p_verquad(p):
-    '''
-    verquad :
-    '''
-    verQuadruple(tempsize)
 
 def p_assignMatrix(p):
     '''
@@ -553,21 +567,6 @@ def p_fun_addFun(p):
         programDirectory.getVarTable().addVar(p[2], p[1], 0, "local", constdir)
 
 
-def p_funcall(p):
-    ''' 
-    funcall : ID era OPARENTHESIS funcall2 CPARENTHESIS SEMICOLON gosub
-    '''
-    currFun = p[1]
-    if p[-1] == "=":
-        operandStack.add(p[1])
-
-
-def p_funcall2(p):
-    ''' 
-    funcall2 : params
-             | empty
-    '''
-
 
 def p_forloop(p):
     '''
@@ -588,7 +587,7 @@ def p_forcontrol(p):
     operandStack.add(p[1])
     Memory.sumConstant()
     constdir = Memory.assignDir("constant", "constant", 1)
-    programDirectory.getVarTable().addVar(p[1], "int", 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(p[1], "int", 1, "constant", constdir)
 
 
 def p_expression(p):
@@ -755,7 +754,7 @@ def p_funparams(p):
     elif p[1] == "bool":
         Memory.sumLocalBool()
     constdir = Memory.assignDir("local", p[1], 1)
-    programDirectory.getVarTable().addVar(p[2], p[1], 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(p[2], p[1], 1, "constant", constdir)
     for i in eraData:
         if i[0] == currFun:
             i[1].append(p[2])
@@ -792,18 +791,18 @@ def p_varvalue(p):
         typeStack.add("int")
         constdir = Memory.assignDir("constant", "constant", 1)
         programDirectory.getVarTable().addVar(
-            p[1], "int", 0, "constant", constdir)
+            p[1], "int", 1, "constant", constdir)
     else:
         try:
             constdir = Memory.assignDir("constant", "constant", 1)
             if str(type(p[1]))[8:11] == "int":
                 typeStack.add("int")
                 programDirectory.getVarTable().addVar(
-                    p[1], str(type(p[1]))[8:11], 0, "constant", constdir)
+                    p[1], str(type(p[1]))[8:11], 1, "constant", constdir)
             elif str(type(p[1])[8:13]) == "float":
                 typeStack.add("float")
                 programDirectory.getVarTable().addVar(
-                    p[1], str(type(p[1]))[8:13], 0, "constant", constdir)
+                    p[1], str(type(p[1]))[8:13], 1, "constant", constdir)
             operandStack.add(p[1])
         except:
             operandStack.add(p[1])
@@ -1057,7 +1056,7 @@ def p_for_end(p):
     global id
     global vcontrol
     constdir = Memory.assignDir("constant", "constant", 1)
-    programDirectory.getVarTable().addVar(1, "int", 0, "constant", constdir)
+    programDirectory.getVarTable().addVar(1, "int", 1, "constant", constdir)
     tempQuad = quadruples.Quadruple(id, '+', vcontrol, 1, '')
     ty = createTemp()
     tempQuad.setResult(ty)
@@ -1091,7 +1090,6 @@ def createQuadruple():
     if operatorStack.top() == '=':
         assignQuadruple()
     elif operandStack.top() == 'RETURN':
-        print("top fue return")
         returnQuadruple()    
     else:
         operationQuadruple()
@@ -1131,20 +1129,24 @@ def createParamTemp():
 def  returnQuadruple():
     global id
     global currFun
+    operandStack.add(currFun)
     tempQuad = quadruples.Quadruple(id, '', '', '', '')
     tempQuad.setOperator(operatorStack)
     operatorStack.pop()
+    tempQuad.setOperandLeft(operandStack)
+    operandStack.pop()
     tempQuad.setResult(operandStack.top())
     quadrupleList.append(tempQuad)
     id += 1
-    operandStack.add(currFun)
 
 def verQuadruple(size):
     global id
     tempQuad1 = quadruples.Quadruple(id, 'VER', '', size, '')
+    tempQuad1.setResult(operandStack.pop())
+    save = operandStack.pop()
     tempQuad1.setOperandLeft(operandStack)
     operandStack.pop()
-    tempQuad1.setResult(operandStack.pop())
+    operandStack.add(save)
     quadrupleList.append(tempQuad1)
     id += 1
     # Assign quadruple

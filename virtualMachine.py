@@ -3,6 +3,8 @@ from virtualMemory import Memory
 
 
 class virtualMachine:
+    global direspecifica
+
     def __init__(self, directory: VariableTable(), quadruples: list, eraData: list):
         self.directory = directory
         self.quadruples = quadruples
@@ -155,10 +157,10 @@ class virtualMachine:
         self.assignedVars.update(obj)
 
     def jadeWrite(self, var):
-        self.directory.printContent()
         try:
             if var[0:4] == "temp":
                 content = self.directory.getItem(var).returnDir()
+                print(self.assignedVars.get(content))
             else:
                 dir1 = self.assignedVars.get(
                     self.directory.getItem(var).returnDir())
@@ -169,8 +171,7 @@ class virtualMachine:
                     print(self.assignedVars.get(
                         self.directory.getItem(var).returnDir()))
         except:
-            print("var", var, "dir", self.directory.getItem(var).returnDir())
-            #print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
+            print(self.assignedVars.get(self.directory.getItem(var).returnDir()))
 
     def ExecuteQuadruple(self, quadruple):
         self.pointerGlobal += 1
@@ -186,9 +187,28 @@ class virtualMachine:
         elif quadruple.getOperator() == '/':
             self.jadeDiv(quadruple.getOperandLeft(),
                          quadruple.getOperandRight(), quadruple.getResult())
+        elif quadruple.getOperator() == 'VER':
+            sizedir = self.directory.getItem(
+                    quadruple.getOperandLeft()).returnDir()
+            size = self.assignedVars.get(sizedir)
+            if size < quadruple.getOperandRight():
+                currType = self.directory.getItem(quadruple.getResult()).returnType()
+                currScope = self.directory.getItem(quadruple.getResult()).returnScope()
+                calc = self.directory.getItem(quadruple.getResult()).returnSize() - size
+                direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
+                self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
+            else:
+                print("Error, tamaño fuera de limites")
+                exit()                 
         elif quadruple.getOperator() == '=':
             if self.quadruples[quadruple.getId()-1].getOperator() == "VER":
-                print("RESOLVER JUNTOS") 
+                vardir = self.directory.getItem(quadruple.getOperandRight()).returnDir()
+                val = self.assignedVars.get(vardir)
+                arrsize = self.directory.getItem(quadruple.getOperandLeft()).returnSize()
+                calc = val - arrsize 
+                arrdir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
+                obj = {arrdir + calc: quadruple.getResult()}
+                self.assignedVars.update(obj)
             else:    
                 dir = self.directory.getItem(
                     quadruple.getOperandLeft()).returnDir()
@@ -217,10 +237,9 @@ class virtualMachine:
         elif quadruple.getOperator() == 'GOSUB':
             self.jadeGoSub(quadruple.getResult())
         elif quadruple.getOperator() == 'RETURN':
-            print("return quad en mv")
-        elif quadruple.getOperator() == 'VER':
-            #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())          
-            print("HOLA")
+            dir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
+            obj = {dir: quadruple.getResult()}
+            self.assignedVars.update(obj)
         elif quadruple.getOperator() == 'READ':
             dir = self.directory.getItem(
                 quadruple.getResult()).returnDir()
@@ -240,8 +259,7 @@ class virtualMachine:
     def virtualMachineStart(self):
         # look for assignment of global variables
         for i in range(0, self.quadruples[0].getResult()):
-            if self.quadruples[i].getOperator() == '=' and self.directory.getItem(
-                    self.quadruples[i].getOperandLeft()).returnScope() == "global":
+            if self.quadruples[i].getOperator() == '=' and self.directory.getItem(self.quadruples[i].getOperandLeft()).returnScope() == "global":
                 dir = self.directory.getItem(
                     self.quadruples[i].getOperandLeft()).returnDir()
                 obj = {dir: self.quadruples[i].getResult()}

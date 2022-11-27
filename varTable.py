@@ -12,7 +12,7 @@ class VariableTable:
 
     # Function to validate type
     def validateType(self, type):
-        if type != 'object' and type != 'int' and type != 'float' and type != 'bool':
+        if type != 'object' and type != 'int' and type != 'float' and type != 'bool' and type != 'constant': 
             return False
         return True
 
