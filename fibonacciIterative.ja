@@ -1,25 +1,28 @@
 program fibonacci {
-    fun int fibo(int cont) {
-        var array int fiboseq = [100];
-        var int i;
-        var int res;
-        assign i = 2;
-        assign array fiboseq[0] = 0;
-        assign array fiboseq[1] = 1;
-        
-        while(i<=cont;){
-            var int sequno;
-            assign sequno = i - 2;
-            var int seqdos;
-            assign seqdos = i - 1;
-            assign i = i + 1; 
-        }
-        
-        assign res = fiboseq[0];
-        return res; 
-    }
     main {
-        fibo(4);
-        print(i);
+        var int i;
+        var int curr;
+        var int prev1;
+        var int prev2;
+        assign prev1 = 1;
+        assign prev2 = 1;
+        var int cont;
+        read cont;
+        
+        if (cont == 0) {
+            assign curr = 1;
+        }
+        if (cont == 1) {
+            assign curr = 1;
+        }  
+        else{
+            assign cont = cont + 1;
+            for (i = 2 : cont) {
+                assign curr = prev1 + prev2;
+                assign prev2 = prev1;
+                assign prev1 = curr;
+                print(curr);
+            }
+        }
     }
 }

@@ -7,10 +7,10 @@ program test5{
         var int i;
         assign i = 2;
         assign num = 1;
-        assign array unid[1] = 10; 
-        assign array unid[2] = num;
+        assign array unid[i] = 10; 
+        assign array unid[3] = num;
         assign num = i + 1;
-        print(num);
-        print(unid[0]);
+
+        print(unid[i]);
     }
 }

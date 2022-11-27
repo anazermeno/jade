@@ -16,8 +16,9 @@ program test4 {
             print(num2);
         }
         while(i <= cont;){
+            print(cont);
             assign i = i + 1;
         }
-        print(cont);
+        
     }
 }
