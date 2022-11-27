@@ -8,7 +8,7 @@ program test12{
         var int i;
 
         read n;
-        
+
         for(i=1 : n+1){
            assign myFact = myFact * i; 
         }

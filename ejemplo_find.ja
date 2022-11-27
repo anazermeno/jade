@@ -1,0 +1,29 @@
+program find {
+    main {
+        var array int arreglo1 = [6];
+        var int i;
+        var int num;
+        var int prov;
+        var int existe;
+        assign existe = 0;
+
+        for(i = 0 : 6){
+            assign array arreglo1[i] = i;
+        }
+
+        read num;
+
+        for(i = 0 : 6){
+            assign prov = arreglo1[i];
+            print(prov);
+            if(prov == num){
+                print(i);
+                assign existe = 1;
+            }
+        }
+
+        print(existe);
+    }
+
+    
+}

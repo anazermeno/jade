@@ -23,8 +23,18 @@ class virtualMachine:
             else:
                 result += self.assignedVars.get(rightDir)
         except:
-            rightDir = self.directory.getItem(right).returnDir()
-            result += self.assignedVars.get(rightDir)
+            try:
+                rightDir = self.directory.getItem(right).returnDir()
+                result += self.assignedVars.get(rightDir)
+            except:
+                rightDir = self.directory.getItem(right).returnDir()
+                el = self.assignedVars.get(rightDir)
+                dir2 = self.directory.getItem(el).returnDir()
+                try:
+                    result += self.assignedVars.get(dir2)
+                except:
+                    rightDir = self.directory.getItem(self.assignedVars.get(dir2)).returnDir()
+                    result += self.assignedVars.get(rightDir)
         try:
             if left[0:4] == "temp":
                 leftDir = self.directory.getItem(left).returnDir()
@@ -102,13 +112,12 @@ class virtualMachine:
         while self.quadruples[pointer].getOperator() != 'ENDFUN':
             self.ExecuteQuadruple(self.quadruples[pointer])
             pointer += 1
+        pointer += 1 
 
     def jadeGoto(self, pointer):
         while pointer <= self.pointerGlobal:
-            if pointer < len(self.quadruples):
-                self.ExecuteQuadruple(self.quadruples[pointer])
+            self.ExecuteQuadruple(self.quadruples[pointer])
             pointer += 1
-        pointer = self.pointerGlobal
 
     def jadeLogicOp(self, quadruple):
         leftDir = self.directory.getItem(
@@ -191,21 +200,39 @@ class virtualMachine:
             sizedir = self.directory.getItem(
                     quadruple.getOperandLeft()).returnDir()
             size = self.assignedVars.get(sizedir)
-            if size < quadruple.getOperandRight():
-                currType = self.directory.getItem(quadruple.getResult()).returnType()
-                currScope = self.directory.getItem(quadruple.getResult()).returnScope()
-                calc = self.directory.getItem(quadruple.getResult()).returnSize() - size
-                direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
-                self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
-            else:
-                print("Error, tamaño fuera de limites")
-                exit()                 
+            try:
+                if size < quadruple.getOperandRight():
+                    currType = self.directory.getItem(quadruple.getResult()).returnType()
+                    currScope = self.directory.getItem(quadruple.getResult()).returnScope()
+                    calc = self.directory.getItem(quadruple.getResult()).returnSize() - size
+                    direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
+                    self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
+                else:
+                    print("Error, tamaño fuera de limites", size, quadruple.getOperandRight())
+                    exit()        
+            except:
+                sizedir = self.directory.getItem(size).returnDir()
+                size = self.assignedVars.get(sizedir)     
+                if size < quadruple.getOperandRight():
+                    currType = self.directory.getItem(quadruple.getResult()).returnType()
+                    currScope = self.directory.getItem(quadruple.getResult()).returnScope()
+                    calc = self.directory.getItem(quadruple.getResult()).returnSize() - size
+                    direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
+                    self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
+                else:
+                    print("Error, tamaño fuera de limites", size, quadruple.getOperandRight())
+                    exit()            
         elif quadruple.getOperator() == '=':
             if self.quadruples[quadruple.getId()-1].getOperator() == "VER":
                 vardir = self.directory.getItem(quadruple.getOperandRight()).returnDir()
                 val = self.assignedVars.get(vardir)
                 arrsize = self.directory.getItem(quadruple.getOperandLeft()).returnSize()
-                calc = val - arrsize 
+                try:
+                    calc = val - arrsize 
+                except:
+                    vardir = self.directory.getItem(val).returnDir()
+                    val = self.assignedVars.get(vardir)
+                    calc = val - arrsize 
                 arrdir = self.directory.getItem(quadruple.getOperandLeft()).returnDir()
                 obj = {arrdir + calc: quadruple.getResult()}
                 self.assignedVars.update(obj)
