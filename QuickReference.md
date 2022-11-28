@@ -32,6 +32,50 @@ program jade {
 * BOOL
 
 ## Variable declaration
+The nomenclature to declare variables is the following, remember to always specify your variable type!
+
+* Remember you can declare variables in your global scope or local scopes (main & functions)
+
+```
+program jade {
+    var int ex1;
+    var float ex2;
+    var bool ex3;
+
+    main {
+        var int ja1;
+        var float ja2;
+        var bool ja3;
+    }
+}
+``` 
+
+## Variable value assignation
+Now we know how to declare variables, now let's see how to give a value to our variables...
+
+* Remember to assign the appropiate values according to the variable type!
+
+```
+program jade {
+    var int ex1;
+    var float ex2;
+    var bool ex3;
+
+    assign ex1 = 2;
+    assign ex2 = 7.8;
+    assign ex3 = True;
+
+    main {
+        var int ja1;
+        var float ja2;
+        var bool ja3;
+
+        assign ja1 = 7;
+        assign ja2 = 8.8;
+        assign ja3 = False;
+    }
+}
+``` 
 
 ## Conditionals
 
