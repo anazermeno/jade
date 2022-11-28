@@ -103,7 +103,7 @@ class virtualMachine:
                 varb += self.assignedVars.get(i)
         if varb == 0:
             print(
-                "No se puede hacer la división porque es entre cero o no se ha asignado valor a la variable")
+                "Error: unable to make division, either because it is by 0 or the variable does not have an assigned value yet")
         else:
             obj = {self.directory.getItem(result).returnDir(): (vara/varb)}
             self.assignedVars.update(obj)
@@ -208,7 +208,7 @@ class virtualMachine:
                     direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
                     self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
                 else:
-                    print("Error, tamaño fuera de limites", size, quadruple.getOperandRight())
+                    print("Error, size out of limits", size, quadruple.getOperandRight())
                     exit()        
             except:
                 sizedir = self.directory.getItem(size).returnDir()
@@ -220,7 +220,7 @@ class virtualMachine:
                     direspecifica = self.directory.getItem(quadruple.getResult()).returnDir() - calc
                     self.directory.addVar(quadruple.getResult()+str(size), currType, 1, currScope, direspecifica)
                 else:
-                    print("Error, tamaño fuera de limites", size, quadruple.getOperandRight())
+                    print("Error, size out of limits", size, quadruple.getOperandRight())
                     exit()            
         elif quadruple.getOperator() == '=':
             if self.quadruples[quadruple.getId()-1].getOperator() == "VER":

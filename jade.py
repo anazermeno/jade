@@ -391,7 +391,7 @@ def p_assign2(p):
                 programDirectory.getVarTable().getItem(p[1]).returnType())
         else:
             print("Error", p[1])
-            print("Error: La variable no ha sido declarada antes de su uso")
+            print("Error: varible is not declared yet")
             exit()
 
 
@@ -418,7 +418,7 @@ def p_assign3(p):
                 programDirectory.getVarTable().getItem(p[1]).returnType()) 
         else:
             print("Error", p[1], p[3])
-            print("Error: La variable no ha sido declarada antes de su uso")
+            print("Error: variable is not declared for use yet")
             exit()
 
 
@@ -435,7 +435,7 @@ def p_assignArray(p):
     '''
     # check bounds quadruple
     if not programDirectory.getVarTable().idExist(p[3]):
-        print("Error, no se ha declarado el arreglo")
+        print("Error: array is not declared yet")
         exit()
 
     global id
@@ -464,7 +464,7 @@ def p_assignArray(p):
             quadrupleList.append(tempQuad)
             id += 1
         else:
-            print("Error, el tamaño debe ser mayor a 0")
+            print("Error: index size must be equal or greater than 0")
             exit()
     else:
         operandStack.add(p[8])
@@ -485,7 +485,7 @@ def p_assignMatrix(p):
         quadrupleList.append(tempQuad)
         id += 1
     else:
-        print("Error: índice fuera de los límites")
+        print("Error: index out of limits")
 
 
 def p_condition(p):
@@ -575,7 +575,7 @@ def p_read(p):
         id += 1
     else:
         print("Error", p[2])
-        print("Error: La variable no ha sido declarada antes de su lectura")
+        print("Error: input variable is not delcared yet")
         exit()
 
 
@@ -725,7 +725,7 @@ def p_addOperand(p):
                 programDirectory.getVarTable().getItem(p[1]).returnType())
         else:
             print("Error", p[1])
-            print("Error: La variable no ha sido declarada antes de su uso")
+            print("Error: variable is not declared for use in expresions yet")
             exit()
 
 
@@ -821,7 +821,7 @@ def p_varvalue(p):
             operandStack.add(p[1])
             typeStack.add(itemType)
         else:
-            print("Error: el tipo de variable no coincide con el valor asignado ")
+            print("Error: assigned value does not match variable type ")
             exit()
     elif p[-4] == "for":
         operandStack.add(p[1])
@@ -869,7 +869,6 @@ def p_addclass(p):
     '''
     addclass : empty
     '''
-    # Agregar a directorio
 
 
 def p_objconstructor(p):
@@ -951,7 +950,7 @@ def p_gosub(p):
             tempQuad.setResult(item[1])
             found = not found
     if found == False:
-        print("Error: la función aún no ha sido definida")
+        print("Error: function is not defined yet")
         exit()  # Cambiar por direccion
     global scopeList
     scopeList.append("local")
@@ -982,7 +981,7 @@ def p_addparam(p):
         typeStack.add(
             programDirectory.getVarTable().getItem(p[-1]).returnType())
     else:
-        print("Error en parámetros")
+        print("Error: parameters are incorrect")
         exit()
 
     tempQuad.setOperandLeft(operandStack)
@@ -1039,11 +1038,11 @@ def p_for_id(p):
         operandStack.add(p[1])
         returnType = programDirectory.getVarTable().getItem(p[1]).returnType()
         if returnType != "int":
-            print("Error:la variable contadora no es entera")
+            print("Error: cycle controller variable is not int type")
             exit()
         typeStack.add(returnType)
     else:
-        print("Error: No se ha declarado la variable contadora")
+        print("Error: cycle controller variable is not declared yet")
         exit()
 
 
@@ -1111,7 +1110,6 @@ def p_for_end(p):
     # operandStack.pop()
 
 # Error handler for illegal syntaxis
-
 
 def p_error(p):
     print("Syntax error at " + str(p.value))
@@ -1215,7 +1213,7 @@ def operationQuadruple():
     if CUBE.get(typeL) != None:
         result = CUBE.get(typeL).get(typeR).get(operatorStack.top())
         if result == -1:
-            print("Error, no coinciden los tipos")
+            print("Error: type mismatch")
             exit()
         else:
             tempQuad.setValues(operandStack, operatorStack)
@@ -1225,7 +1223,7 @@ def operationQuadruple():
             quadrupleList.append(tempQuad)
             id += 1
     else:
-        print("error en el tipo de operador")
+        print("Error: operator type incorrect")
         exit()
 
 
@@ -1312,7 +1310,7 @@ case_TestCorrect2 = parser.parse(f5.read())
 
 if (dError == True):
     #for quadruple in quadrupleList:
-    #   print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
+        #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()

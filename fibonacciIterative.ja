@@ -21,8 +21,8 @@ program fibonacci {
                 assign curr = prev1 + prev2;
                 assign prev2 = prev1;
                 assign prev1 = curr;
-                print(curr);
             }
+            print(curr);
         }
     }
 }

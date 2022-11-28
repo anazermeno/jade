@@ -19,9 +19,6 @@ program find {
                 assign existe = 1;
             }
         }
-
         print(existe);
-    }
-
-    
+    }  
 }
