@@ -1304,8 +1304,8 @@ f5 = open(inputfile, "r")
 case_TestCorrect2 = parser.parse(f5.read())
 
 if (dError == True):
-    for quadruple in quadrupleList:
-        print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
+    #for quadruple in quadrupleList:
+    #    print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()
