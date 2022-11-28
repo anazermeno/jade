@@ -169,8 +169,6 @@ def t_ignore_newline(t):
     t.lexer.lineno += t.value.count('\n')
 
 # Error handler for illegal characters
-
-
 def t_error(t):
     print(f'Illegal character {t.value[0]!r}')
     t.lexer.skip(1)
@@ -184,12 +182,10 @@ lexer = lex.lex()
 # Parser
 # Functions for each grammar rule
 
-
 def p_program(p):
     '''
     program : PROGRAM createDir OCURLY changeScope block main CCURLY
     '''
-
 
 def p_createDir(p):
     '''
@@ -402,7 +398,7 @@ def p_assign3(p):
             | ID OBRACKET ID CBRACKET
             | ID OBRACKET CTEINT CBRACKET
     '''
-    if p[1] != None:  # arreglo
+    if p[1] != None:  # Array case
         if programDirectory.getVarTable().idExist(p[1]) and str(type(p[3]))[8:11] == "int":
             operandStack.add(p[3])
             operandStack.add(p[1])
@@ -433,7 +429,7 @@ def p_assignArray(p):
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL BOOL SEMICOLON
                 | ASSIGN ARRAY ID OBRACKET CTEINT CBRACKET EQUAL ID SEMICOLON
     '''
-    # check bounds quadruple
+    # Check bounds quadruple
     if not programDirectory.getVarTable().idExist(p[3]):
         print("Error: array is not declared yet")
         exit()
@@ -441,7 +437,7 @@ def p_assignArray(p):
     global id
     if str(type(p[5]))[8:11] == "int":
         if p[5] >= 0:
-            # agregar entero a tabla de variables
+            # Add int to var table
             constDir = Memory.assignDir("constant", "constant", 1)
             programDirectory.getVarTable().addVar(
                 p[5], "constant", 1, "constant", constDir)
@@ -1153,7 +1149,6 @@ def createParamTemp():
     param += 1
     myTemp = "param" + str(param)
     currScope = scopeList[len(scopeList)-1]
-    # cambiar para enviar verdadero tipo
     vardir = Memory.assignDir(currScope, "int", 1)
     programDirectory.getVarTable().addVar(myTemp, "int", 0, currScope, vardir)
     return myTemp
@@ -1237,7 +1232,7 @@ def printQuadruple():
 
 
 def gotoFQuadruple():
-    # Aqui va la validacion de tipo, si es bool genera cuadruplo
+    # Bool type validation
     global id
     tempQuad = quadruples.Quadruple(id, 'gotoF', '', '', '')
     tempQuad.setOperandLeft(operandStack)
@@ -1309,8 +1304,8 @@ f5 = open(inputfile, "r")
 case_TestCorrect2 = parser.parse(f5.read())
 
 if (dError == True):
-    #for quadruple in quadrupleList:
-        #print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
+    for quadruple in quadrupleList:
+        print(quadruple.getId(), quadruple.getOperator(), quadruple.getOperandLeft(), quadruple.getOperandRight(), quadruple.getResult())
     maquinaVirtual = virtualMachine(
         programDirectory.returnDirectory(), quadrupleList, eraData)
     maquinaVirtual.virtualMachineStart()

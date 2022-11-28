@@ -5,11 +5,13 @@ def validateOperator(operatorNew, operatorStack):
             return True
         else:
             return False
+    # Validate for operator + and -
     elif operatorNew == "+" or operatorNew == "-":
         if operatorStack == "*" or operatorStack == "/" or operatorStack == "+" or operatorStack == "-":
             return True
         else:
             return False
+     # Validate for operator <, <=, >, >=, ==, !=
     elif operatorNew == "<" or operatorNew == ">" or operatorNew == "<=" or operatorNew == ">=" or operatorNew == "!=" or operatorNew == "==":
         if operatorStack == "*" or operatorStack == "/" or operatorStack == "+" or operatorStack == "-" or operatorStack == "<" or operatorStack == ">" or operatorStack == "<=" or operatorStack == ">=" or operatorStack == "!=" or operatorStack == "==":
             return True
