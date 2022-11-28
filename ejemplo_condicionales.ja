@@ -1,0 +1,16 @@
+program test3 {
+    var int uno;
+    var int dos;
+    main{
+        assign uno = 1;
+        assign dos = 30;
+        var int tres;
+        assign tres = 1;
+
+        if(uno >= dos){
+            print(uno);
+        }else{
+            print(dos);
+        }
+    }
+}
